@@ -1,0 +1,12 @@
+const mongoose = require('mongoose');
+const { Schema, model } = mongoose;
+const User = model('User', new Schema({ name:String,email:{type:String,unique:true,required:true},passwordHash:{type:String,select:false},role:{type:String,enum:['employee','hr'],default:'employee'},company:String,team:{type:Schema.Types.ObjectId,ref:'Team'} }));
+const Team = model('Team', new Schema({ name:String,company:String,inviteCode:{type:String,unique:true} }));
+const metricSchema = new Schema({user:{type:Schema.Types.ObjectId,ref:'User',required:true},date:{type:String,required:true},steps:{type:Number,default:0},sleepHours:{type:Number,default:0},source:{type:String,enum:['manual','health_connect_demo'],default:'manual'}});
+metricSchema.index({user:1,date:1},{unique:true});
+const Metric=model('Metric',metricSchema);
+const Challenge=model('Challenge',new Schema({team:{type:Schema.Types.ObjectId,ref:'Team'},title:String,description:String,tip:String,metric:{type:String,enum:['steps','sleep']},target:Number,context:String,createdAt:{type:Date,default:Date.now}}));
+const ChallengeResult=model('ChallengeResult',new Schema({challenge:{type:Schema.Types.ObjectId,ref:'Challenge'},user:{type:Schema.Types.ObjectId,ref:'User'},completionPct:Number,thumbs:{type:String,enum:['up','down','none'],default:'none'},createdAt:{type:Date,default:Date.now}}));
+const Rescue=model('Rescue',new Schema({user:{type:Schema.Types.ObjectId,ref:'User'},originalGoal:Number,reducedGoal:Number,message:String,recovered:{type:Boolean,default:false},createdAt:{type:Date,default:Date.now}}));
+const AuditLog=model('AuditLog',new Schema({company:String,actor:{type:Schema.Types.ObjectId,ref:'User'},action:String,createdAt:{type:Date,default:Date.now}}));
+module.exports={User,Team,Metric,Challenge,ChallengeResult,Rescue,AuditLog};

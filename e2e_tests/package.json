@@ -1,0 +1,14 @@
+{
+  "name": "e2e_tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node run_thriveloop_test.js"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

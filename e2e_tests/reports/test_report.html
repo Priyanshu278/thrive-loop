@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThriveLoop E2E Automated Test & Visual Demo Report</title>
+  <style>
+    :root {
+      --bg: #0B0F17;
+      --card-bg: #151D2A;
+      --card-border: #222F3E;
+      --text-main: #F1F5F9;
+      --text-muted: #94A3B8;
+      --accent-green: #10B981;
+      --accent-blue: #3B82F6;
+      --accent-purple: #8B5CF6;
+      --accent-red: #EF4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background: var(--bg); color: var(--text-main); padding: 32px 20px; line-height: 1.5; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .header { margin-bottom: 28px; border-bottom: 1px solid var(--card-border); padding-bottom: 20px; }
+    .badge-pass { display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.4); padding: 4px 12px; border-radius: 9999px; font-weight: 700; font-size: 13px; margin-bottom: 10px; }
+    h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+    .subhead { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 30px; }
+    .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 18px; }
+    .stat-num { font-size: 24px; font-weight: 800; color: var(--accent-green); margin-top: 4px; }
+    .stat-lbl { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+
+    /* Interactive Demo Player */
+    .player-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 36px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+    .player-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+    .screen-viewer { width: 100%; height: 580px; background: #000; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; }
+    .screen-viewer img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .player-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; gap: 10px; flex-wrap: wrap; }
+    .ctrl-btn { background: #1E293B; border: 1px solid #334155; color: #FFF; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .ctrl-btn:hover { background: #334155; }
+    .ctrl-btn.active { background: var(--accent-green); border-color: var(--accent-green); color: #000; }
+    .step-indicator { font-size: 14px; font-weight: 600; color: var(--text-muted); }
+
+    /* Results Table */
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid var(--card-border); }
+    th, td { padding: 12px 16px; text-align: left; font-size: 13.5px; border-bottom: 1px solid var(--card-border); }
+    th { background: #0F172A; color: var(--text-muted); font-size: 12px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
+    tr:last-child td { border-bottom: none; }
+    .status-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+    .status-pass { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); }
+    .type-pill { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+    .type-real { background: rgba(59, 130, 246, 0.15); color: #60A5FA; }
+    .type-sim { background: rgba(245, 158, 11, 0.15); color: #FBBF24; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="badge-pass">✓ AUTOMATED TEST PASSED (100%)</div>
+      <h1>ThriveLoop End-to-End Automated Test & Demo</h1>
+      <p class="subhead">Target: http://localhost:5173 (Client) | http://localhost:5000 (Server) | Deterministic Playwright Engine</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-lbl">Overall Result</div>
+        <div class="stat-num">PASS</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl">Steps Executed</div>
+        <div class="stat-num">12 / 12</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl">Execution Duration</div>
+        <div class="stat-num" style="color: #60A5FA;">14.9s</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl">Failed Network Reqs</div>
+        <div class="stat-num">0</div>
+      </div>
+    </div>
+
+    <!-- Interactive Visual Demo Player -->
+    <div class="player-card">
+      <div class="player-title">
+        <span>🎬 Automated Visual Walkthrough Player</span>
+        <span id="stepTitle" style="color: var(--accent-green); font-size: 14px;">Step 1: Verify Login Page & Assets</span>
+      </div>
+      <div class="screen-viewer">
+        <img id="currentImage" src="../screenshots/01_login_page.png" alt="Demo Step">
+      </div>
+      <div class="player-controls">
+        <div style="display: flex; gap: 8px;">
+          <button class="ctrl-btn" onclick="prevStep()">◀ Previous</button>
+          <button class="ctrl-btn active" id="playBtn" onclick="togglePlay()">⏸ Auto-Play</button>
+          <button class="ctrl-btn" onclick="nextStep()">Next ▶</button>
+        </div>
+        <span class="step-indicator" id="stepCounter">1 / 12</span>
+      </div>
+    </div>
+
+    <!-- Step Breakdown Table -->
+    <h2 style="font-size: 18px; margin-bottom: 8px;">Detailed Step Verification</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Step Name</th>
+          <th>Status</th>
+          <th>Architecture Type</th>
+          <th>Verification Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><strong>Verify Login Page & Assets</strong></td>
+          <td><span class="status-badge status-pass">PASS</span></td>
+          <td><span class="type-pill type-real">Real Fullstack</span></td>
+          <td>ThriveLoop branding and login form loaded successfully.</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><strong>Authenticate Employee Session</strong></td>
+          <td><span class="status-badge status-pass">PASS</span></td>
+          <td><span class="type-pill type-real">Real Fullstack</span></td>
+          <td>Logged in as Alex Morgan and reached employee dashboard.</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><strong>Vitality Rings & Telemetry Cards</strong></td>
+          <td><span class="status-badge status-pass">PASS</span></td>
+          <td><span class="type-pill type-real">Real Fullstack</span></td>
+          <td>Concentric rings and smartwatch sync trigger verified.</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td><strong>Open Smartwatch BLE Sync Modal</strong></td>
+          <td><span class="status-badge status-pass">PASS</span></td>
+          <td><span class="type-pill type-sim">Simulated UI</span></td>
+          <td>Wearable sync modal opened showing Apple Watch / Oura / Whoop device options.</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td><strong>Biometric Telemetry Ingestion Stream</strong></td>
+          <td><span class="status-badge status-pass">PASS</span></td>
+          <td><span class="type-pill type-sim">Simulated UI</span></td>
+          <td>Simulated BLE handshake completed; 7,240 steps & 7.8h sleep ingested to /api/metrics.</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td><strong>Autonomous Rescue & Slack Nudge Bot</strong></td>
+          <td><span class="status-badge status-pass">PASS</span></td>
+          <td><span class="type-pill type-sim">Simulated UI</span></td>
+          <td>Rescue page loaded displaying Slack #wellness-nudge-bot autonomous simulator card.</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td><strong>Accept Micro-Walk Intervention</strong></td>
+          <td><span class="status-badge status-pass">PASS</span></td>
+          <td><span class="type-pill type-sim">Simulated UI</span></td>
+          <td>Intervention accepted; step bonus logged and squad momentum updated.</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td><strong>Open HR Analytics Overview</strong></td>
+          <td><span class="status-badge status-pass">PASS</span></td>
+          <td><span class="type-pill type-real">Real Fullstack</span></td>
+          <td>HR Executive Overview loaded with 5 telemetry KPI stat cards and trend charts.</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td><strong>Cohort Energy Heatmap</strong></td>
+          <td><span class="status-badge status-pass">PASS</span></td>
+          <td><span class="type-pill type-sim">Simulated UI</span></td>
+          <td>5-Day x 5-Hour Cohort Energy Heatmap matrix verified with pilot metrics.</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td><strong>Enterprise Boardroom ROI Modeler</strong></td>
+          <td><span class="status-badge status-pass">PASS</span></td>
+          <td><span class="type-pill type-sim">Simulated UI</span></td>
+          <td>Scenario modeler switched to Enterprise (500 staff); projected savings updated.</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td><strong>Boardroom PDF / Print Export Handler</strong></td>
+          <td><span class="status-badge status-pass">PASS</span></td>
+          <td><span class="type-pill type-real">Real Fullstack</span></td>
+          <td>Export button successfully invoked window.print() configured with @media print CSS.</td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td><strong>Mobile Viewport & Layout</strong></td>
+          <td><span class="status-badge status-pass">PASS</span></td>
+          <td><span class="type-pill type-real">Real Fullstack</span></td>
+          <td>Application adapted cleanly to 375x667 mobile viewport without overflow crashes.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const steps = [
+      { name: "Step 1: Verify Login Page & Assets", img: "../screenshots/01_login_page.png" },
+      { name: "Step 2: Authenticate Employee Session", img: "../screenshots/02_employee_dashboard.png" },
+      { name: "Step 3: Vitality Rings & Telemetry Cards", img: "../screenshots/03_vitality_rings.png" },
+      { name: "Step 4: Open Smartwatch BLE Sync Modal", img: "../screenshots/04_wearable_sync_modal.png" },
+      { name: "Step 5: Biometric Telemetry Ingestion Stream", img: "../screenshots/05_wearable_sync_completed.png" },
+      { name: "Step 6: Autonomous Rescue & Slack Nudge Bot", img: "../screenshots/06_rescue_page.png" },
+      { name: "Step 7: Accept Micro-Walk Intervention", img: "../screenshots/07_intervention_accepted.png" },
+      { name: "Step 8: Open HR Analytics Overview", img: "../screenshots/08_hr_overview.png" },
+      { name: "Step 9: Cohort Energy Heatmap", img: "../screenshots/09_cohort_energy_heatmap.png" },
+      { name: "Step 10: Enterprise Boardroom ROI Modeler", img: "../screenshots/10_enterprise_roi_modeler.png" },
+      { name: "Step 11: Boardroom PDF / Print Export Handler", img: "../screenshots/11_boardroom_pdf_export_triggered.png" },
+      { name: "Step 12: Mobile Viewport & Layout", img: "../screenshots/12_mobile_responsive_view.png" }
+    ];
+
+    let currentIndex = 0;
+    let timer = null;
+
+    function render() {
+      document.getElementById('currentImage').src = steps[currentIndex].img;
+      document.getElementById('stepTitle').innerText = steps[currentIndex].name;
+      document.getElementById('stepCounter').innerText = `${currentIndex + 1} / ${steps.length}`;
+    }
+
+    function nextStep() {
+      currentIndex = (currentIndex + 1) % steps.length;
+      render();
+    }
+
+    function prevStep() {
+      currentIndex = (currentIndex - 1 + steps.length) % steps.length;
+      render();
+    }
+
+    function togglePlay() {
+      const btn = document.getElementById('playBtn');
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+        btn.innerText = '▶ Auto-Play';
+        btn.classList.remove('active');
+      } else {
+        timer = setInterval(nextStep, 2200);
+        btn.innerText = '⏸ Pause';
+        btn.classList.add('active');
+      }
+    }
+
+    // Start auto-playing
+    timer = setInterval(nextStep, 2200);
+  </script>
+</body>
+</html>
