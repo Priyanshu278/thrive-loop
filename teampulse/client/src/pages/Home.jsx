@@ -319,6 +319,10 @@ export function Home({ data, onRefresh, onNavigate }) {
                   key={h.id}
                   className={`habit-row-item ${h.completed ? 'completed' : ''}`}
                   onClick={() => toggleHabit(h.id)}
+                  onKeyDown={(e) => onRowKeyActivate(e, () => toggleHabit(h.id))}
+                  role="checkbox"
+                  aria-checked={h.completed}
+                  tabIndex={0}
                 >
                   <div className="habit-icon-box" style={{ background: `${h.color}18`, color: h.color }}>
                     <Icon size={17} />
