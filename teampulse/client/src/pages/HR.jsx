@@ -778,7 +778,7 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
                       <Users size={18} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <h3 className="team-item-name" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.name}</h3>
+                      <h3 className="team-item-name" title={t.name} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.name}</h3>
                       <span className="team-item-members-count">{t.members} active members</span>
                     </div>
                     <span
@@ -1918,6 +1918,9 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
               overflowY: 'auto'
             }}
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${selectedTeamModal.name} team details`}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1932,7 +1935,8 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
               <button
                 type="button"
                 onClick={() => setSelectedTeamModal(null)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', padding: '4px' }}
+                aria-label={`Close ${selectedTeamModal.name} details`}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', width: '44px', height: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', marginRight: '-10px', flexShrink: 0 }}
               >
                 <X size={18} />
               </button>
