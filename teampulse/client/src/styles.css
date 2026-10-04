@@ -9594,3 +9594,486 @@ button {
     padding: 0;
   }
 }
+
+/* ==========================================================================
+   THRIVELOOP — DEDICATED METRIC ANALYTICS MODALS (Master Reference media_1791107344502)
+   Steps, Active Minutes & Sleep dedicated interactive sheets
+   ========================================================================== */
+
+.metric-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.48);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  padding: 16px;
+  animation: metricFadeIn 0.2s ease-out;
+}
+
+@keyframes metricFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.metric-modal-sheet {
+  background: #FFFFFF;
+  border-radius: 28px;
+  box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.22), 0 0 1px rgba(0, 0, 0, 0.1);
+  max-width: 410px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 20px 24px;
+  position: relative;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  animation: metricSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+@keyframes metricSlideUp {
+  from { transform: translateY(16px) scale(0.98); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* Custom subtle scrollbar */
+.metric-modal-sheet::-webkit-scrollbar {
+  width: 5px;
+}
+.metric-modal-sheet::-webkit-scrollbar-thumb {
+  background: #E2E8F0;
+  border-radius: 999px;
+}
+
+.metric-modal-handle {
+  width: 38px;
+  height: 4px;
+  background: #CBD5E1;
+  border-radius: 999px;
+  margin: 0 auto 14px;
+}
+
+.metric-modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #F1F5F9;
+  border: none;
+  display: grid;
+  place-items: center;
+  color: #64748B;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  z-index: 2;
+}
+
+.metric-modal-close-btn:hover {
+  background: #E2E8F0;
+  color: #0F172A;
+}
+
+/* Header */
+.metric-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 16px;
+  padding-right: 36px;
+}
+
+.metric-modal-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.metric-modal-title-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-modal-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.15;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.metric-modal-subtitle {
+  font-size: 12.5px;
+  color: #64748B;
+  font-weight: 500;
+  margin: 2px 0 0 0;
+}
+
+/* Tabs */
+.metric-modal-tabs-row {
+  display: flex;
+  gap: 24px;
+  border-bottom: 1px solid #E2E8F0;
+  margin-bottom: 18px;
+}
+
+.metric-tab-item {
+  background: transparent;
+  border: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #64748B;
+  padding: 0 0 8px 0;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.15s ease;
+}
+
+.metric-tab-item:hover {
+  color: #0F172A;
+}
+
+.metric-tab-item.active {
+  color: #0F172A;
+  font-weight: 700;
+}
+
+.tab-active-indicator {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #0F172A;
+  border-radius: 2px 2px 0 0;
+}
+
+/* Circular Ring Wrapper */
+.metric-ring-wrapper {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 16px;
+  display: grid;
+  place-items: center;
+}
+
+.metric-ring-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.metric-ring-center-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 1;
+}
+
+.metric-center-num {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+
+.metric-center-sub {
+  font-size: 11.5px;
+  color: #64748B;
+  font-weight: 500;
+  margin: 2px 0;
+}
+
+.metric-center-pct {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+/* Dual Stat Cards (Goal / Remaining) */
+.metric-dual-stat-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.metric-stat-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  box-sizing: border-box;
+}
+
+.metric-stat-icon-wrap {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.metric-stat-box-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.metric-stat-lbl {
+  font-size: 10.5px;
+  color: #64748B;
+  font-weight: 600;
+}
+
+.metric-stat-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0F172A;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Cheer / Alert Banner */
+.metric-cheer-banner {
+  border-radius: 14px;
+  border: 1px solid transparent;
+  padding: 12px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin-bottom: 18px;
+  box-sizing: border-box;
+}
+
+.metric-cheer-icon {
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.metric-cheer-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-cheer-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.metric-cheer-desc {
+  font-size: 11.5px;
+  color: #475569;
+  margin: 3px 0 0 0;
+  line-height: 1.4;
+}
+
+/* 7-Day Trend Section */
+.metric-trend-section {
+  margin-bottom: 16px;
+}
+
+.metric-trend-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0 0 10px 0;
+}
+
+.metric-trend-bars-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 94px;
+  padding: 4px 4px 0;
+}
+
+.metric-trend-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+}
+
+.metric-bar-top-val {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #64748B;
+}
+
+.metric-bar-track {
+  height: 60px;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.metric-bar-fill {
+  width: 20px;
+  border-radius: 5px 5px 3px 3px;
+  transition: height 0.4s ease;
+}
+
+.metric-bar-day-lbl {
+  font-size: 10.5px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.metric-bar-day-lbl.today {
+  color: #0F172A;
+  font-weight: 700;
+}
+
+/* Tip / Educational Card */
+.metric-education-card {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 10px 13px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  box-sizing: border-box;
+}
+
+.metric-edu-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.metric-edu-text {
+  font-size: 11.5px;
+  color: #334155;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Tab 2: Weekly Summary Grid */
+.metric-summary-card {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.metric-summary-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.metric-summary-header h4 {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+}
+
+.metric-summary-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.summary-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.summary-stat-label {
+  font-size: 10.5px;
+  color: #64748B;
+  font-weight: 600;
+}
+
+.summary-stat-num {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+/* Tab 3: Insights List */
+.metric-insights-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.metric-insight-card {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+}
+
+.metric-insight-card-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.metric-insight-card-body h5 {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0 0 3px 0;
+}
+
+.metric-insight-card-body p {
+  font-size: 11.5px;
+  color: #475569;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Bottom Sheet view on small mobile */
+@media (max-width: 480px) {
+  .metric-modal-backdrop {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .metric-modal-sheet {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    max-width: 100%;
+    width: 100%;
+    padding: 14px 18px 24px;
+    max-height: 88vh;
+  }
+}

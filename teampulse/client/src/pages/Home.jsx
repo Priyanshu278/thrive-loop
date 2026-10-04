@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { CheckInModal } from '../components/domain/CheckInModal';
+import { MetricAnalyticsModal } from '../components/domain/MetricAnalyticsModal';
 import { HabitRescueModal } from '../components/domain/HabitRescueModal';
 import { WearableSyncModal } from '../components/domain/WearableSyncModal';
 import {
@@ -33,6 +34,7 @@ import { getMemberAvatar, handleAvatarError } from '../utils/avatars';
 
 export function Home({ data, onRefresh, onNavigate }) {
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
+  const [activeMetricModal, setActiveMetricModal] = useState(null); // 'steps' | 'active' | 'sleep' | null
   const [isRescueOpen, setIsRescueOpen] = useState(false);
   const [isWatchSyncOpen, setIsWatchSyncOpen] = useState(false);
   const [metricTab, setMetricTab] = useState('steps');
@@ -71,18 +73,18 @@ export function Home({ data, onRefresh, onNavigate }) {
   const todayStr = new Date().toISOString().slice(0, 10);
   const todayData = data.week?.metrics?.find((m) => m.date === todayStr);
 
-  const currentSteps = todayData?.steps || 2340;
-  const stepGoal = data.week?.goal || 4000;
+  const currentSteps = todayData?.steps || 7240;
+  const stepGoal = data.week?.goal || 8000;
   const stepsPct = Math.min(100, Math.round((currentSteps / stepGoal) * 100));
 
-  const activeMinActual = 18;
+  const activeMinActual = todayData?.activeMinutes || 18;
   const activeMinGoal = 30;
   const activeMinPct = Math.min(100, Math.round((activeMinActual / activeMinGoal) * 100));
 
-  const sleepActual = todayData?.sleepHours || 6.5;
+  const sleepActual = todayData?.sleepHours || 7.8;
   const sleepGoal = 8;
   const sleepPct = Math.min(100, Math.round((sleepActual / sleepGoal) * 100));
-  const sleepHours = todayData?.sleepHours ? `${todayData.sleepHours} h` : '6.5 h';
+  const sleepHours = todayData?.sleepHours ? `${todayData.sleepHours} h` : '7.8 h';
 
   const overallRingsPct = Math.round((stepsPct + activeMinPct + sleepPct) / 3);
 
@@ -169,7 +171,7 @@ export function Home({ data, onRefresh, onNavigate }) {
 
           {/* Quick Floating Telemetry Cards Inside Hero */}
           <div className="hero-metrics-quad">
-            <div className="hero-metric-pill" onClick={() => setIsCheckInOpen(true)}>
+            <div className="hero-metric-pill" onClick={() => setActiveMetricModal('steps')}>
               <div className="hero-metric-icon-wrap" style={{ background: '#ECFDF5', color: '#10B981' }}>
                 <Footprints size={18} />
               </div>
@@ -183,32 +185,32 @@ export function Home({ data, onRefresh, onNavigate }) {
               <span className="hero-metric-pct">{stepsPct}%</span>
             </div>
 
-            <div className="hero-metric-pill" onClick={() => setIsCheckInOpen(true)}>
+            <div className="hero-metric-pill" onClick={() => setActiveMetricModal('active')}>
               <div className="hero-metric-icon-wrap" style={{ background: '#FFF7ED', color: '#F97316' }}>
                 <Flame size={18} />
               </div>
               <div className="hero-metric-info">
-                <div className="hero-metric-num">18 min</div>
-                <div className="hero-metric-lbl">of 30 min active</div>
+                <div className="hero-metric-num">{activeMinActual} min</div>
+                <div className="hero-metric-lbl">of {activeMinGoal} min active</div>
                 <div className="hero-metric-bar">
-                  <div className="hero-bar-fill orange" style={{ width: '60%' }} />
+                  <div className="hero-bar-fill orange" style={{ width: `${activeMinPct}%` }} />
                 </div>
               </div>
-              <span className="hero-metric-pct">60%</span>
+              <span className="hero-metric-pct">{activeMinPct}%</span>
             </div>
 
-            <div className="hero-metric-pill" onClick={() => setIsCheckInOpen(true)}>
+            <div className="hero-metric-pill" onClick={() => setActiveMetricModal('sleep')}>
               <div className="hero-metric-icon-wrap" style={{ background: '#F5F3FF', color: '#8B5CF6' }}>
                 <Moon size={18} />
               </div>
               <div className="hero-metric-info">
                 <div className="hero-metric-num">{sleepHours}</div>
-                <div className="hero-metric-lbl">of 8 h sleep</div>
+                <div className="hero-metric-lbl">of {sleepGoal} h sleep</div>
                 <div className="hero-metric-bar">
-                  <div className="hero-bar-fill purple" style={{ width: '81%' }} />
+                  <div className="hero-bar-fill purple" style={{ width: `${sleepPct}%` }} />
                 </div>
               </div>
-              <span className="hero-metric-pct">81%</span>
+              <span className="hero-metric-pct">{sleepPct}%</span>
             </div>
 
             <div className="hero-metric-quote-pill" onClick={() => onNavigate('rescue')} style={{ cursor: 'pointer' }}>
@@ -459,7 +461,7 @@ export function Home({ data, onRefresh, onNavigate }) {
               </div>
 
               <div className="concentric-metrics-breakdown">
-                <div className="ring-breakdown-row" onClick={() => setIsCheckInOpen(true)} style={{ cursor: 'pointer' }}>
+                <div className="ring-breakdown-row" onClick={() => setActiveMetricModal('steps')} style={{ cursor: 'pointer' }}>
                   <div className="ring-legend-label">
                     <span className="ring-dot-indicator" style={{ background: '#10B981' }} />
                     <span>Daily Steps</span>
@@ -470,7 +472,7 @@ export function Home({ data, onRefresh, onNavigate }) {
                   </div>
                 </div>
 
-                <div className="ring-breakdown-row" onClick={() => setIsCheckInOpen(true)} style={{ cursor: 'pointer' }}>
+                <div className="ring-breakdown-row" onClick={() => setActiveMetricModal('active')} style={{ cursor: 'pointer' }}>
                   <div className="ring-legend-label">
                     <span className="ring-dot-indicator" style={{ background: '#F97316' }} />
                     <span>Active Minutes</span>
@@ -481,7 +483,7 @@ export function Home({ data, onRefresh, onNavigate }) {
                   </div>
                 </div>
 
-                <div className="ring-breakdown-row" onClick={() => setIsCheckInOpen(true)} style={{ cursor: 'pointer' }}>
+                <div className="ring-breakdown-row" onClick={() => setActiveMetricModal('sleep')} style={{ cursor: 'pointer' }}>
                   <div className="ring-legend-label">
                     <span className="ring-dot-indicator" style={{ background: '#8B5CF6' }} />
                     <span>Restful Sleep</span>
@@ -772,6 +774,20 @@ export function Home({ data, onRefresh, onNavigate }) {
         onClose={() => setIsCheckInOpen(false)}
         currentToday={todayData}
         onSaved={onRefresh}
+      />
+
+      <MetricAnalyticsModal
+        isOpen={!!activeMetricModal}
+        onClose={() => setActiveMetricModal(null)}
+        metricType={activeMetricModal || 'steps'}
+        data={{
+          steps: currentSteps,
+          stepGoal,
+          activeMinutes: activeMinActual,
+          activeMinGoal,
+          sleepHours: sleepActual,
+          sleepGoal,
+        }}
       />
 
       <HabitRescueModal
