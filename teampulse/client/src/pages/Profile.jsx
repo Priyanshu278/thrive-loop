@@ -840,6 +840,9 @@ export function Profile({ me, onLogout }) {
               overflowY: 'auto'
             }}
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Recent Activity Log"
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -849,7 +852,8 @@ export function Profile({ me, onLogout }) {
               <button
                 type="button"
                 onClick={() => setActivityModalOpen(false)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', padding: '4px' }}
+                aria-label="Close activity log"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', width: '44px', height: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', marginRight: '-10px', flexShrink: 0 }}
               >
                 <X size={18} />
               </button>
@@ -913,6 +917,9 @@ export function Profile({ me, onLogout }) {
               overflowY: 'auto'
             }}
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Unlocked Achievements"
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -922,7 +929,8 @@ export function Profile({ me, onLogout }) {
               <button
                 type="button"
                 onClick={() => setAchievementsModalOpen(false)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', padding: '4px' }}
+                aria-label="Close achievements"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', width: '44px', height: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', marginRight: '-10px', flexShrink: 0 }}
               >
                 <X size={18} />
               </button>
