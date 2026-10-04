@@ -29,6 +29,16 @@ import {
 import { VERIFIED_AVATARS, getMemberAvatar, handleAvatarError } from '../utils/avatars';
 import { MetricAnalyticsModal } from '../components/domain/MetricAnalyticsModal';
 
+// The KPI telemetry cards are role="button" sections with tabIndex=0, so they
+// are reachable by Tab but were inert: Enter and Space did nothing. Handle
+// both keys so the keyboard path matches a real button.
+function onCardKeyActivate(e, activate) {
+  if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+    e.preventDefault();
+    activate();
+  }
+}
+
 export function Profile({ me, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -218,6 +228,7 @@ export function Profile({ me, onLogout }) {
         <Card
           className="telemetry-stat-card"
           onClick={() => setActiveMetricModal('steps')}
+          onKeyDown={(e) => onCardKeyActivate(e, () => setActiveMetricModal('steps'))}
           style={{ cursor: 'pointer' }}
           title="Click to view detailed Steps analytics"
           role="button"
@@ -238,6 +249,7 @@ export function Profile({ me, onLogout }) {
         <Card
           className="telemetry-stat-card"
           onClick={() => setActiveMetricModal('active')}
+          onKeyDown={(e) => onCardKeyActivate(e, () => setActiveMetricModal('active'))}
           style={{ cursor: 'pointer' }}
           title="Click to view detailed Activity analytics"
           role="button"
@@ -258,6 +270,7 @@ export function Profile({ me, onLogout }) {
         <Card
           className="telemetry-stat-card"
           onClick={() => setActiveMetricModal('sleep')}
+          onKeyDown={(e) => onCardKeyActivate(e, () => setActiveMetricModal('sleep'))}
           style={{ cursor: 'pointer' }}
           title="Click to view detailed Sleep analytics"
           role="button"
@@ -278,7 +291,7 @@ export function Profile({ me, onLogout }) {
         <Card
           className="telemetry-stat-card"
           onClick={() => setActiveTab('goals')}
-          style={{ cursor: 'pointer' }}
+          onKeyDown={(e) => onCardKeyActivate(e, () => setActiveTab('goals'))}
           title="Click to view Personal Wellbeing Goals"
           role="button"
           tabIndex={0}
