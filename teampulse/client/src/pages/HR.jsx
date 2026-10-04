@@ -49,6 +49,16 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
     setTab(defaultTab);
   }, [defaultTab]);
 
+  // The sidebar (App.jsx) highlights the nav item matching its own `page`
+  // state, which is fed back in as `defaultTab`. In-tab "View All" links used
+  // to call setTab() directly, which changed the panel but left the sidebar
+  // highlighting the previous section. Route every in-app tab change through
+  // onNavigate() so the nav highlight stays in sync.
+  const goTab = (next) => {
+    setTab(next);
+    if (onNavigate) onNavigate(next);
+  };
+
   const [teamCategory, setTeamCategory] = useState('all');
   const [teamSearch, setTeamSearch] = useState('');
   const [impactMode, setImpactMode] = useState('post'); // 'baseline' | 'post'
@@ -524,7 +534,7 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
             <Card className="hr-tri-card">
               <div className="card-top-header">
                 <h3 className="card-main-title">Team Participation</h3>
-                <button type="button" className="header-view-link" onClick={() => setTab('teams')}>View All →</button>
+                <button type="button" className="header-view-link" onClick={() => goTab('teams')}>View All →</button>
               </div>
               <p className="card-sub-description" style={{ marginBottom: '12px' }}>Active members by cohort</p>
 
@@ -553,7 +563,7 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
             <Card className="hr-tri-card">
               <div className="card-top-header">
                 <h3 className="card-main-title">Key Insights</h3>
-                <button type="button" className="header-view-link" onClick={() => setTab('impact')}>View Report →</button>
+                <button type="button" className="header-view-link" onClick={() => goTab('impact')}>View Report →</button>
               </div>
 
               <div className="key-insights-stack">
@@ -673,7 +683,7 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
             <Card className="hr-activity-feed-card">
               <div className="card-top-header">
                 <h3 className="card-main-title">Recent Activity</h3>
-                <button type="button" className="header-view-link" onClick={() => setTab('teams')}>View All →</button>
+                <button type="button" className="header-view-link" onClick={() => goTab('teams')}>View All →</button>
               </div>
               <div className="hr-feed-items">
                 <div className="hr-feed-row">
