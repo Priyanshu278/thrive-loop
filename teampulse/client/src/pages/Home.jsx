@@ -728,11 +728,25 @@ export function Home({ data, onRefresh, onNavigate }) {
               <Lightbulb size={17} style={{ color: '#10B981' }} />
               <h2 className="card-main-title">Insights for You</h2>
             </div>
-            <span className="widget-subtitle-pill">This Week ▾</span>
+            <span
+              className="widget-subtitle-pill"
+              style={{ cursor: 'pointer' }}
+              onClick={() => setActiveMetricModal('steps')}
+              title="Click to view weekly telemetry"
+            >
+              This Week ▾
+            </span>
           </div>
 
           <div className="insights-vertical-list">
-            <div className="insight-row-item">
+            <div
+              className="insight-row-item"
+              style={{ cursor: 'pointer' }}
+              onClick={() => setActiveMetricModal('steps')}
+              title="Click to view Steps analytics"
+              role="button"
+              tabIndex={0}
+            >
               <div className="insight-icon-square green">
                 <Footprints size={17} />
               </div>
@@ -743,7 +757,14 @@ export function Home({ data, onRefresh, onNavigate }) {
               <ChevronRight size={16} className="insight-chevron" />
             </div>
 
-            <div className="insight-row-item">
+            <div
+              className="insight-row-item"
+              style={{ cursor: 'pointer' }}
+              onClick={() => setActiveMetricModal('sleep')}
+              title="Click to view Sleep analytics"
+              role="button"
+              tabIndex={0}
+            >
               <div className="insight-icon-square purple">
                 <Moon size={17} />
               </div>
@@ -754,7 +775,14 @@ export function Home({ data, onRefresh, onNavigate }) {
               <ChevronRight size={16} className="insight-chevron" />
             </div>
 
-            <div className="insight-row-item">
+            <div
+              className="insight-row-item"
+              style={{ cursor: 'pointer' }}
+              onClick={() => setActiveMetricModal('active')}
+              title="Click to view Activity analytics"
+              role="button"
+              tabIndex={0}
+            >
               <div className="insight-icon-square yellow">
                 <Zap size={17} />
               </div>

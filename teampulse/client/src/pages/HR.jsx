@@ -201,23 +201,25 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
     { id: 'strat', name: 'Executive Strategy', category: 'strategy', members: 3, activePct: null, steps: null, sleep: null, hidden: true, status: 'Privacy Protected (< 5 members)', badge: '🛡️ Protected', sparkline: null, color: '#64748B' },
   ];
 
-  const teamsData = (hrOverview && hrOverview.length > 0)
-    ? hrOverview.map((item, idx) => ({
-        id: `db-${idx}`,
-        name: item.team,
-        category: 'all',
-        members: item.members,
-        activePct: item.hidden ? null : 84,
-        steps: item.hidden ? null : item.avgSteps,
-        sleep: item.hidden ? null : item.avgSleep,
-        hidden: item.hidden,
-        status: item.hidden ? 'Privacy Protected (< 5 members)' : 'Live Team Metric',
-        badge: item.hidden ? '🛡️ Protected' : (idx % 2 === 0 ? '🔥 High Rhythm' : '⚡ In Sync'),
-        sparkline: item.hidden ? null : [68, 72, 75, 78, 80, 82, 84],
-        color: ['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#06B6D4'][idx % 5],
+  const teamsData = defaultTeamsData.map((team) => {
+    const live = Array.isArray(hrOverview)
+      ? hrOverview.find((item) =>
+          item.team?.toLowerCase()?.includes(team.name?.toLowerCase()) ||
+          team.name?.toLowerCase()?.includes(item.team?.toLowerCase())
+        )
+      : null;
+    if (live) {
+      return {
+        ...team,
+        members: live.members || team.members,
+        hidden: live.hidden !== undefined ? live.hidden : team.hidden,
+        status: live.hidden ? 'Privacy Protected (< 5 members)' : 'Live Team Metric',
+        badge: live.hidden ? '🛡️ Protected' : '🔥 High Rhythm',
         isReal: true,
-      }))
-    : defaultTeamsData;
+      };
+    }
+    return team;
+  });
 
   const filteredTeams = teamsData.filter((t) => {
     const matchesCat = teamCategory === 'all' || t.category === teamCategory;

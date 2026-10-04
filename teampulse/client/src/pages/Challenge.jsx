@@ -390,7 +390,14 @@ export function Challenge({ challenge, teamMembers = [], onRefresh, onBack, onNa
                   <Users size={16} style={{ color: '#10B981' }} />
                   <h3 className="card-main-title">Team Members</h3>
                 </div>
-                <span className="header-view-link">See All →</span>
+                <span
+                  className="header-view-link"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => onNavigate ? onNavigate('team') : (onBack && onBack())}
+                  title="View full squad roster"
+                >
+                  See All →
+                </span>
               </div>
 
               <div className="members-vertical-list">
@@ -418,7 +425,17 @@ export function Challenge({ challenge, teamMembers = [], onRefresh, onBack, onNa
                   <Lightbulb size={16} style={{ color: '#F59E0B' }} />
                   <h3 className="card-main-title">Tips for Success</h3>
                 </div>
-                <span className="header-view-link">View More</span>
+                <span
+                  className="header-view-link"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    setActionMsg('✓ Showing all daily wellness tips for squad momentum!');
+                    setTimeout(() => setActionMsg(''), 3500);
+                  }}
+                  title="View more squad tips"
+                >
+                  View More
+                </span>
               </div>
 
               <div className="tips-vertical-list">
