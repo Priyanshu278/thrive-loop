@@ -45,18 +45,19 @@ export function Login({ onDone }) {
       localStorage.setItem('role', data.role);
       onDone(data);
     } catch (err) {
-      localStorage.setItem('token', 'demo-token');
-      localStorage.setItem('role', role);
-      onDone({ role, name: role === 'hr' ? 'Sarah Connor' : 'Alex Morgan' });
+      // Never fabricate a token here. A made-up session makes every later API
+      // call return 401 while the UI quietly renders fallback data, so the
+      // failure has to stay visible instead.
+      setError(err.message || 'Demo login failed - please try again');
     } finally {
       setBusy(false);
     }
   }
 
+  // Demo shortcut that still performs a real login, so the preview session is
+  // authenticated and the dashboard shows live data rather than fallbacks.
   function guestPreview() {
-    localStorage.setItem('token', 'demo-token');
-    localStorage.setItem('role', 'hr');
-    onDone({ role: 'hr', name: 'Alex Morgan' });
+    quickLogin('hr');
   }
 
   return (
@@ -220,7 +221,7 @@ export function Login({ onDone }) {
               cursor: 'pointer'
             }}
           >
-            🚀 Direct Preview Without Login →
+            🚀 One-Click Demo Preview →
           </button>
         </div>
 
