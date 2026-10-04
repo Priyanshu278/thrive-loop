@@ -607,10 +607,13 @@ export default function App() {
           {page === 'profile' && (
             <Profile me={data.me} onLogout={handleLogout} />
           )}
-          {page === 'privacy' && (
-            <Privacy onBack={() => setPage(role === 'hr' ? 'overview' : 'home')} />
+          {page === 'privacy' && role !== 'hr' && (
+            <Privacy onBack={() => setPage('home')} />
           )}
-          {['overview', 'teams', 'impact', 'roi'].includes(page) && (
+          {['overview', 'teams', 'impact', 'privacy', 'roi'].includes(page) && role === 'hr' && (
+            <HR defaultTab={page} onNavigate={setPage} />
+          )}
+          {['overview', 'teams', 'impact', 'roi'].includes(page) && role !== 'hr' && (
             <HR defaultTab={page} onNavigate={setPage} />
           )}
         </div>

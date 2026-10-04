@@ -27,10 +27,14 @@ import {
   X
 } from 'lucide-react';
 import { VERIFIED_AVATARS, getMemberAvatar, handleAvatarError } from '../utils/avatars';
+import { MetricAnalyticsModal } from '../components/domain/MetricAnalyticsModal';
 
 export function Profile({ me, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [activeMetricModal, setActiveMetricModal] = useState(null); // 'steps' | 'active' | 'sleep' | null
+  const [activityModalOpen, setActivityModalOpen] = useState(false);
+  const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
   const [profileName, setProfileName] = useState(me?.name || 'Alex Morgan');
   const [profileDept, setProfileDept] = useState('Product Team');
   const [profileLocation, setProfileLocation] = useState('Indore, India');
@@ -179,7 +183,14 @@ export function Profile({ me, onLogout }) {
 
       {/* 3. FOUR KPI TELEMETRY CARDS */}
       <section className="profile-telemetry-row">
-        <Card className="telemetry-stat-card">
+        <Card
+          className="telemetry-stat-card"
+          onClick={() => setActiveMetricModal('steps')}
+          style={{ cursor: 'pointer' }}
+          title="Click to view detailed Steps analytics"
+          role="button"
+          tabIndex={0}
+        >
           <div className="stat-icon-square mint">
             <Footprints size={18} />
           </div>
@@ -188,11 +199,18 @@ export function Profile({ me, onLogout }) {
             <div className="stat-big-val">
               6,480 <span className="stat-delta-green">↑ 12%</span>
             </div>
-            <span className="stat-sub-caption">vs last week</span>
+            <span className="stat-sub-caption">vs last week • tap for analytics</span>
           </div>
         </Card>
 
-        <Card className="telemetry-stat-card">
+        <Card
+          className="telemetry-stat-card"
+          onClick={() => setActiveMetricModal('active')}
+          style={{ cursor: 'pointer' }}
+          title="Click to view detailed Activity analytics"
+          role="button"
+          tabIndex={0}
+        >
           <div className="stat-icon-square orange">
             <Flame size={18} />
           </div>
@@ -201,11 +219,18 @@ export function Profile({ me, onLogout }) {
             <div className="stat-big-val">
               32 min <span className="stat-delta-green">↑ 18%</span>
             </div>
-            <span className="stat-sub-caption">vs last week</span>
+            <span className="stat-sub-caption">vs last week • tap for analytics</span>
           </div>
         </Card>
 
-        <Card className="telemetry-stat-card">
+        <Card
+          className="telemetry-stat-card"
+          onClick={() => setActiveMetricModal('sleep')}
+          style={{ cursor: 'pointer' }}
+          title="Click to view detailed Sleep analytics"
+          role="button"
+          tabIndex={0}
+        >
           <div className="stat-icon-square purple">
             <Moon size={18} />
           </div>
@@ -214,11 +239,18 @@ export function Profile({ me, onLogout }) {
             <div className="stat-big-val">
               7.2 h <span className="stat-delta-green">↑ 8%</span>
             </div>
-            <span className="stat-sub-caption">vs last week</span>
+            <span className="stat-sub-caption">vs last week • tap for analytics</span>
           </div>
         </Card>
 
-        <Card className="telemetry-stat-card">
+        <Card
+          className="telemetry-stat-card"
+          onClick={() => setActiveTab('goals')}
+          style={{ cursor: 'pointer' }}
+          title="Click to view Personal Wellbeing Goals"
+          role="button"
+          tabIndex={0}
+        >
           <div className="stat-icon-square blue">
             <Target size={18} />
           </div>
@@ -228,7 +260,7 @@ export function Profile({ me, onLogout }) {
             <div className="stat-mini-progress">
               <div className="stat-progress-fill green" style={{ width: '80%' }} />
             </div>
-            <span className="stat-sub-caption">6,720 / 8,400 steps</span>
+            <span className="stat-sub-caption">6,720 / 8,400 steps • tap for goals</span>
           </div>
         </Card>
       </section>
@@ -375,14 +407,27 @@ export function Profile({ me, onLogout }) {
                   <Clock size={16} style={{ color: '#3B82F6' }} />
                   <h3 className="card-main-title">Recent Activity</h3>
                 </div>
-                <span className="header-view-link">See All →</span>
+                <span
+                  className="header-view-link"
+                  onClick={() => setActivityModalOpen(true)}
+                  style={{ cursor: 'pointer' }}
+                  title="View full activity log"
+                >
+                  See All →
+                </span>
               </div>
 
               <div className="profile-recent-list">
                 {recentActivity.map((r, idx) => {
                   const Icon = r.icon;
                   return (
-                    <div key={idx} className="profile-activity-item">
+                    <div
+                      key={idx}
+                      className="profile-activity-item"
+                      onClick={() => setActivityModalOpen(true)}
+                      style={{ cursor: 'pointer' }}
+                      title="Click to view activity details"
+                    >
                       <div className="activity-icon-sq" style={{ background: `${r.color}15`, color: r.color }}>
                         <Icon size={14} />
                       </div>
@@ -403,11 +448,23 @@ export function Profile({ me, onLogout }) {
                   <Award size={16} style={{ color: '#10B981' }} />
                   <h3 className="card-main-title">Achievements</h3>
                 </div>
-                <span className="header-view-link">View All →</span>
+                <span
+                  className="header-view-link"
+                  onClick={() => setAchievementsModalOpen(true)}
+                  style={{ cursor: 'pointer' }}
+                  title="View all badges and unlocked milestones"
+                >
+                  View All →
+                </span>
               </div>
 
               <div className="achievements-triplet-row">
-                <div className="achievement-badge-item">
+                <div
+                  className="achievement-badge-item"
+                  onClick={() => setAchievementsModalOpen(true)}
+                  style={{ cursor: 'pointer' }}
+                  title="Click to view achievement details"
+                >
                   <div className="achievement-hexagon green">
                     <Award size={20} />
                   </div>
@@ -415,7 +472,12 @@ export function Profile({ me, onLogout }) {
                   <span>Consistency Master</span>
                 </div>
 
-                <div className="achievement-badge-item">
+                <div
+                  className="achievement-badge-item"
+                  onClick={() => setAchievementsModalOpen(true)}
+                  style={{ cursor: 'pointer' }}
+                  title="Click to view achievement details"
+                >
                   <div className="achievement-hexagon blue">
                     <Footprints size={20} />
                   </div>
@@ -423,7 +485,12 @@ export function Profile({ me, onLogout }) {
                   <span>8K+ Daily Rhythm</span>
                 </div>
 
-                <div className="achievement-badge-item">
+                <div
+                  className="achievement-badge-item"
+                  onClick={() => setAchievementsModalOpen(true)}
+                  style={{ cursor: 'pointer' }}
+                  title="Click to view achievement details"
+                >
                   <div className="achievement-hexagon purple">
                     <Moon size={20} />
                   </div>
@@ -444,11 +511,23 @@ export function Profile({ me, onLogout }) {
                 <Target size={16} style={{ color: '#3B82F6' }} />
                 <h3 className="card-main-title">Upcoming Goals</h3>
               </div>
-              <span className="header-view-link">View All →</span>
+              <span
+                className="header-view-link"
+                onClick={() => setActiveTab('goals')}
+                style={{ cursor: 'pointer' }}
+                title="Manage personal goals"
+              >
+                View All →
+              </span>
             </div>
 
             <div className="goals-vertical-list">
-              <div className="goal-row-item">
+              <div
+                className="goal-row-item"
+                onClick={() => setActiveTab('goals')}
+                style={{ cursor: 'pointer' }}
+                title="Click to view Daily Movement Target details"
+              >
                 <div className="goal-icon-circle mint">
                   <Footprints size={15} />
                 </div>
@@ -462,7 +541,12 @@ export function Profile({ me, onLogout }) {
                 <ChevronRight size={16} className="goal-chevron" />
               </div>
 
-              <div className="goal-row-item">
+              <div
+                className="goal-row-item"
+                onClick={() => setActiveTab('goals')}
+                style={{ cursor: 'pointer' }}
+                title="Click to view Active Time details"
+              >
                 <div className="goal-icon-circle orange">
                   <Flame size={15} />
                 </div>
@@ -476,7 +560,12 @@ export function Profile({ me, onLogout }) {
                 <ChevronRight size={16} className="goal-chevron" />
               </div>
 
-              <div className="goal-row-item">
+              <div
+                className="goal-row-item"
+                onClick={() => setActiveTab('goals')}
+                style={{ cursor: 'pointer' }}
+                title="Click to view Sleep Target details"
+              >
                 <div className="goal-icon-circle purple">
                   <Moon size={15} />
                 </div>
@@ -661,6 +750,202 @@ export function Profile({ me, onLogout }) {
                   Save Changes
                 </Button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* METRIC ANALYTICS MODAL (Dedicated Steps / Active / Sleep) */}
+      <MetricAnalyticsModal
+        isOpen={Boolean(activeMetricModal)}
+        onClose={() => setActiveMetricModal(null)}
+        metricType={activeMetricModal || 'steps'}
+        data={{
+          steps: 6480,
+          stepGoal: 8000,
+          activeMinutes: 32,
+          activeGoal: 30,
+          sleepHours: 7.2,
+          sleepGoal: 8
+        }}
+      />
+
+      {/* RECENT ACTIVITY MODAL */}
+      {activityModalOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.5)',
+            backdropFilter: 'blur(3px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+          onClick={() => setActivityModalOpen(false)}
+        >
+          <div
+            style={{
+              background: '#FFFFFF',
+              borderRadius: '20px',
+              maxWidth: '480px',
+              width: '100%',
+              padding: '24px',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+              border: '1px solid #E2E8F0',
+              maxHeight: '90vh',
+              overflowY: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Clock size={18} style={{ color: '#3B82F6' }} />
+                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#0F172A' }}>Recent Activity Log</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActivityModalOpen(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', padding: '4px' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {[
+                ...recentActivity,
+                { text: 'Reached 8,200 steps milestone', time: '3d ago', icon: Footprints, color: '#10B981' },
+                { text: 'Completed 30-min brisk walk', time: '4d ago', icon: Flame, color: '#F97316' },
+                { text: 'Logged 8.0 hours restorative sleep', time: '5d ago', icon: Moon, color: '#8B5CF6' }
+              ].map((r, idx) => {
+                const Icon = r.icon;
+                return (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', background: '#F8FAFC', borderRadius: '12px', border: '1px solid #F1F5F9' }}>
+                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: `${r.color}15`, color: r.color, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+                      <Icon size={16} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block' }}>{r.text}</strong>
+                      <span style={{ fontSize: '11.5px', color: '#64748B' }}>{r.time}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ marginTop: '18px', display: 'flex', justifyContent: 'flex-end' }}>
+              <Button variant="primary" size="sm" onClick={() => setActivityModalOpen(false)}>
+                Done
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ACHIEVEMENTS MODAL */}
+      {achievementsModalOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.5)',
+            backdropFilter: 'blur(3px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+          onClick={() => setAchievementsModalOpen(false)}
+        >
+          <div
+            style={{
+              background: '#FFFFFF',
+              borderRadius: '20px',
+              maxWidth: '520px',
+              width: '100%',
+              padding: '24px',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+              border: '1px solid #E2E8F0',
+              maxHeight: '90vh',
+              overflowY: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Award size={18} style={{ color: '#10B981' }} />
+                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#0F172A' }}>Unlocked Achievements</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAchievementsModalOpen(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', padding: '4px' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' }}>
+              {[
+                { title: '7-Day Streak', desc: 'Consistency Master', color: '#10B981', icon: Award, unlocked: true },
+                { title: 'Step Goal Master', desc: '8K+ Daily Rhythm', color: '#3B82F6', icon: Footprints, unlocked: true },
+                { title: 'Sleep Champion', desc: 'Optimal Rest Window', color: '#8B5CF6', icon: Moon, unlocked: true },
+                { title: 'Weekend Warrior', desc: 'Active Saturday & Sunday', color: '#F59E0B', icon: Flame, unlocked: true },
+                { title: 'Team Sync Hero', desc: '5 Squad Challenges', color: '#06B6D4', icon: CheckCircle2, unlocked: true },
+                { title: '14-Day Streak', desc: 'Next Milestone', color: '#94A3B8', icon: Sparkles, unlocked: false }
+              ].map((badge, idx) => {
+                const Icon = badge.icon;
+                return (
+                  <div
+                    key={idx}
+                    style={{
+                      background: badge.unlocked ? '#F8FAFC' : '#F1F5F9',
+                      border: `1px solid ${badge.unlocked ? '#E2E8F0' : '#CBD5E1'}`,
+                      borderRadius: '14px',
+                      padding: '14px 10px',
+                      textAlign: 'center',
+                      opacity: badge.unlocked ? 1 : 0.6
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        background: `${badge.color}15`,
+                        color: badge.color,
+                        display: 'grid',
+                        placeItems: 'center',
+                        margin: '0 auto 8px'
+                      }}
+                    >
+                      <Icon size={20} />
+                    </div>
+                    <strong style={{ fontSize: '12.5px', color: '#0F172A', display: 'block' }}>{badge.title}</strong>
+                    <span style={{ fontSize: '11px', color: '#64748B' }}>{badge.desc}</span>
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        marginTop: '6px',
+                        fontSize: '10px',
+                        fontWeight: 700,
+                        color: badge.unlocked ? '#059669' : '#64748B',
+                        background: badge.unlocked ? '#ECFDF5' : '#E2E8F0',
+                        padding: '1px 6px',
+                        borderRadius: '6px'
+                      }}
+                    >
+                      {badge.unlocked ? 'Unlocked ✓' : 'In Progress'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ marginTop: '18px', display: 'flex', justifyContent: 'flex-end' }}>
+              <Button variant="primary" size="sm" onClick={() => setAchievementsModalOpen(false)}>
+                Done
+              </Button>
             </div>
           </div>
         </div>

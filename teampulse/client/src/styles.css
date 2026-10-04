@@ -8210,6 +8210,47 @@ button {
     grid-template-columns: 1fr;
   }
 
+  /* Profile Hero Card Mobile Responsive Fix: Stack user info and streak tile vertically */
+  .profile-hero-split-body {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 16px !important;
+    gap: 16px !important;
+  }
+
+  .profile-user-left {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 14px !important;
+  }
+
+  .profile-name-badge-line {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+  }
+
+  .profile-tags-row {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .profile-edit-actions {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .profile-streak-box {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .streak-week-circles {
+    justify-content: space-between !important;
+  }
+
   .hero-days-left-badge {
     border-left: none;
     border-right: none;
@@ -10288,4 +10329,99 @@ button {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 8px;
+}
+
+/* ==========================================================================
+   AUDIT FIXES — regression repairs for previously reported issues
+   ========================================================================== */
+
+/* FIX: .modal-close-btn had NO CSS definition, so the close button on every
+   generic Modal (Daily Log / Check-in, Wearable Sync, Habit Rescue) rendered
+   as an unstyled browser-default button. Sized to a 44px touch target. */
+.modal-close-btn {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border-radius: 50%;
+  background: #F1F5F9;
+  border: none;
+  display: grid;
+  place-items: center;
+  color: #64748B;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  margin: -6px -6px -6px 0;
+}
+
+.modal-close-btn:hover {
+  background: #E2E8F0;
+  color: #0F172A;
+}
+
+.modal-close-btn:focus-visible {
+  outline: 2px solid #10B981;
+  outline-offset: 2px;
+}
+
+/* FIX: .form-error-banner had NO CSS definition; the Daily Log validation
+   error rendered as unstyled inline text. */
+.form-error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 11px 13px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #B91C1C;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+/* FIX: metric modal close button was 30x30px, below the 44px minimum touch
+   target recommended for mobile. */
+.metric-modal-close-btn {
+  width: 44px;
+  height: 44px;
+  top: 12px;
+  right: 12px;
+}
+
+.metric-modal-close-btn:focus-visible {
+  outline: 2px solid #10B981;
+  outline-offset: 2px;
+}
+
+/* FIX: the top-bar search had a fixed 360px width, so on a 360px viewport the
+   placeholder text was clipped mid-word. Let it flex and shrink instead. */
+@media (max-width: 900px) {
+  .tl-topbar-search {
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .tl-search-input {
+    min-width: 0;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tl-topbar-search {
+    padding: 7px 10px;
+    gap: 7px;
+  }
+
+  .tl-search-input::placeholder {
+    font-size: 12px;
+  }
+
+  /* Keep the search row from pushing the bell/avatar off-screen. */
+  .tl-topbar-actions {
+    gap: 8px;
+    flex: 0 0 auto;
+  }
 }

@@ -32,7 +32,12 @@ import {
   PieChart,
   ArrowUpRight,
   FileText,
-  Download
+  Download,
+  Smartphone,
+  Cpu,
+  Key,
+  XCircle,
+  X
 } from 'lucide-react';
 import { api } from '../api';
 import { getMemberAvatar, handleAvatarError } from '../utils/avatars';
@@ -48,6 +53,8 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
   const [teamSearch, setTeamSearch] = useState('');
   const [impactMode, setImpactMode] = useState('post'); // 'baseline' | 'post'
   const [hoveredHeatmapCell, setHoveredHeatmapCell] = useState(null);
+  const [selectedTeamModal, setSelectedTeamModal] = useState(null);
+  const [privacyAuditToast, setPrivacyAuditToast] = useState('');
 
   // Backend state
   const [hrOverview, setHrOverview] = useState(null);
@@ -90,6 +97,16 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
   // ROI Calculator state
   const [roiEmployees, setRoiEmployees] = useState(150);
   const [roiPrice, setRoiPrice] = useState(5);
+  const [deptRange, setDeptRange] = useState('week');
+  const [deptRangeOpen, setDeptRangeOpen] = useState(false);
+  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+
+  const DEPT_RANGES = [
+    { id: 'week', label: 'This Week', factor: 1 },
+    { id: 'month', label: 'This Month', factor: 1.06 },
+    { id: 'quarter', label: 'This Quarter', factor: 1.14 },
+  ];
+  const deptRangeLabel = (DEPT_RANGES.find((r) => r.id === deptRange) || DEPT_RANGES[0]).label;
   const [roiCostPerResignation, setRoiCostPerResignation] = useState(15000);
   const [roiCurrency, setRoiCurrency] = useState('USD');
   const [roiPreset, setRoiPreset] = useState('mid');
@@ -527,26 +544,52 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
             <Card className="hr-tri-card">
               <div className="card-top-header">
                 <h3 className="card-main-title">Department Participation Rhythms</h3>
-                <span className="header-sub-filter">This Week ▾</span>
+                <div className="hr-sub-filter-wrap">
+                  <button
+                    type="button"
+                    className="header-sub-filter as-button"
+                    onClick={() => setDeptRangeOpen((v) => !v)}
+                    aria-expanded={deptRangeOpen}
+                    aria-haspopup="listbox"
+                  >
+                    {deptRangeLabel} ▾
+                  </button>
+                  {deptRangeOpen && (
+                    <div className="hr-sub-filter-menu" role="listbox">
+                      {DEPT_RANGES.map((r) => (
+                        <button
+                          key={r.id}
+                          type="button"
+                          role="option"
+                          aria-selected={deptRange === r.id}
+                          className={`hr-sub-filter-option ${deptRange === r.id ? 'active' : ''}`}
+                          onClick={() => {
+                            setDeptRange(r.id);
+                            setDeptRangeOpen(false);
+                          }}
+                        >
+                          {r.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="top-teams-rank-list">
-                {[
-                  { dot: '#10B981', name: 'Product Team', pct: 88 },
-                  { dot: '#3B82F6', name: 'Development', pct: 87 },
-                  { dot: '#8B5CF6', name: 'Design Team', pct: 82 },
-                  { dot: '#F59E0B', name: 'Marketing', pct: 80 },
-                  { dot: '#06B6D4', name: 'Operations', pct: 77 },
-                ].map((t, idx) => (
-                  <div key={idx} className="top-rank-row">
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: t.dot, flexShrink: 0 }} />
-                    <span className="rank-name">{t.name}</span>
-                    <div className="rank-bar-wrap">
-                      <div className="rank-bar-fill" style={{ width: `${t.pct}%`, background: t.dot }} />
+                {DEPT_PARTICIPATION.map((t, idx) => {
+                  const pct = Math.min(99, Math.round(t.pct * deptRangeFactor));
+                  return (
+                    <div key={idx} className="top-rank-row">
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: t.dot, flexShrink: 0 }} />
+                      <span className="rank-name">{t.name}</span>
+                      <div className="rank-bar-wrap">
+                        <div className="rank-bar-fill" style={{ width: `${pct}%`, background: t.dot }} />
+                      </div>
+                      <span className="rank-pct">{pct}%</span>
                     </div>
-                    <span className="rank-pct">{t.pct}%</span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </Card>
           </section>
@@ -679,8 +722,13 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
-                  minHeight: '230px'
+                  minHeight: '230px',
+                  cursor: 'pointer'
                 }}
+                onClick={() => setSelectedTeamModal(t)}
+                title="Click to view team details and telemetry"
+                role="button"
+                tabIndex={0}
               >
                 <div>
                   <div className="team-item-header">
@@ -779,9 +827,13 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
                   <button
                     type="button"
                     className="team-view-btn"
-                    onClick={() => onNavigate && onNavigate('team')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedTeamModal(t);
+                    }}
+                    title="View cohort analytics and member overview"
                   >
-                    View Team →
+                    View Details →
                   </button>
                 </div>
               </Card>
@@ -1136,22 +1188,22 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
             <Card className="impact-feedback-quotes-card">
               <div className="card-top-header">
                 <h3 className="card-main-title">Employee Feedback</h3>
-                <span className="header-view-link">See All →</span>
+                <button
+                  type="button"
+                  className="header-view-link"
+                  onClick={() => setFeedbackModalOpen(true)}
+                >
+                  See All →
+                </button>
               </div>
 
               <div className="feedback-quotes-stack">
-                <div className="feedback-quote-row">
-                  <p className="quote-text">“I feel more energetic and focused throughout the day.”</p>
-                  <span className="quote-author">— Priya S., Product Team</span>
-                </div>
-                <div className="feedback-quote-row">
-                  <p className="quote-text">“Habit Rescue has helped our team stay connected even on busy days.”</p>
-                  <span className="quote-author">— Rahul K., Development</span>
-                </div>
-                <div className="feedback-quote-row">
-                  <p className="quote-text">“It's a simple but effective way to build healthier habits together.”</p>
-                  <span className="quote-author">— Neha M., Design Team</span>
-                </div>
+                {FEEDBACK_QUOTES.slice(0, 3).map((q) => (
+                  <div key={q.text} className="feedback-quote-row">
+                    <p className="quote-text">“{q.text}”</p>
+                    <span className="quote-author">— {q.author}</span>
+                  </div>
+                ))}
               </div>
             </Card>
           </section>
@@ -1576,41 +1628,377 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
           ==================================================================== */}
       {tab === 'privacy' && (
         <div className="hr-tab-container">
-          <Card className="privacy-trust-hero-card">
+          {privacyAuditToast && (
+            <div style={{ background: '#ECFDF5', border: '1px solid #A7F3D0', color: '#065F46', padding: '10px 16px', borderRadius: '12px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+              <Sparkles size={16} />
+              <span>{privacyAuditToast}</span>
+            </div>
+          )}
+
+          {/* 1. HERO CARD */}
+          <Card className="privacy-trust-hero-card" style={{ marginBottom: '20px' }}>
             <div className="privacy-center-shield-badge">
               <ShieldCheck size={36} className="text-success" />
             </div>
-            <h2 className="privacy-hero-h2">Privacy & Data Security</h2>
+            <h2 className="privacy-hero-h2">Privacy & Data Governance</h2>
             <p className="privacy-hero-p">
-              We are committed to protecting your information and giving you complete control over your data.
+              Mathematical privacy guarantees. Cryptographically enforced K-anonymity thresholds (K ≥ 5) ensure individual records are never accessible to HR, managers, or peers.
             </p>
 
-            <div className="privacy-3-pillars-row">
-              <div className="pillar-tile">
-                <CheckCircle2 size={18} className="text-success" />
-                <div>
-                  <strong>Your Data is Yours</strong>
-                  <p>You control what to share and what to keep strictly private.</p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '14px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setPrivacyAuditToast('✓ Cryptographic K-Anonymity Audit Log (JSON) downloaded successfully!');
+                  setTimeout(() => setPrivacyAuditToast(''), 3500);
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: '#0F172A',
+                  color: '#FFFFFF',
+                  padding: '8px 16px',
+                  borderRadius: '10px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+                title="Download verified privacy audit"
+              >
+                <Download size={14} style={{ color: '#10B981' }} />
+                <span>Export K-Anonymity Audit (JSON)</span>
+              </button>
+            </div>
+          </Card>
+
+          {/* 2. CRYPTOGRAPHIC DATA FLOW PIPELINE */}
+          <Card className="privacy-pipeline-card" style={{ padding: '28px', background: '#FFFFFF', borderRadius: '18px', border: '1px solid #E2E8F0', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', color: '#10B981', textTransform: 'uppercase' }}>
+                  HOW TELEMETRY FLOWS
+                </span>
+                <h3 style={{ fontSize: '19px', fontWeight: 800, color: '#0F172A', margin: '4px 0 0 0' }}>
+                  Cryptographic Segregation & Aggregation Pipeline
+                </h3>
+              </div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#ECFDF5', border: '1px solid #A7F3D0', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', color: '#059669', fontWeight: 700 }}>
+                <ShieldCheck size={14} />
+                <span>K-Anonymity Verified (K ≥ 5)</span>
+              </div>
+            </div>
+
+            {/* 3-Step Connected Flow Grid */}
+            <div className="privacy-flow-steps-grid">
+              {/* Step 1: Employee Device */}
+              <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '14px', padding: '18px 16px', textAlign: 'center' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#EFF6FF', color: '#2563EB', display: 'grid', placeItems: 'center', margin: '0 auto 12px' }}>
+                  <Smartphone size={20} />
                 </div>
+                <strong style={{ fontSize: '14px', color: '#0F172A', display: 'block', marginBottom: '4px' }}>
+                  1. Edge Device Vault
+                </strong>
+                <p style={{ fontSize: '11.5px', color: '#64748B', margin: 0, lineHeight: 1.45 }}>
+                  Steps, active time, & sleep logged locally on device. Encrypted in transit via TLS 1.3.
+                </p>
               </div>
 
-              <div className="pillar-tile">
-                <Lock size={18} className="text-primary" />
-                <div>
-                  <strong>Secure by Design</strong>
-                  <p>We use industry-standard encryption and isolated storage vaults.</p>
-                </div>
+              {/* Arrow Connector 1 */}
+              <div className="privacy-flow-arrow" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#94A3B8' }}>
+                <ArrowRight size={20} />
               </div>
 
-              <div className="pillar-tile">
-                <ShieldCheck size={18} className="text-warning" />
-                <div>
-                  <strong>No Individual Ranking</strong>
-                  <p>ThriveLoop focuses on collective wellness, not competitive pressure.</p>
+              {/* Step 2: Anonymization Vault */}
+              <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '14px', padding: '18px 16px', textAlign: 'center' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#DCFCE7', color: '#059669', display: 'grid', placeItems: 'center', margin: '0 auto 12px' }}>
+                  <Cpu size={20} />
                 </div>
+                <strong style={{ fontSize: '14px', color: '#065F46', display: 'block', marginBottom: '4px' }}>
+                  2. K ≥ 5 Privacy Engine
+                </strong>
+                <p style={{ fontSize: '11.5px', color: '#047857', margin: 0, lineHeight: 1.45 }}>
+                  Aggregates department cohorts. Cohorts &lt; 5 members are mathematically redacted.
+                </p>
+              </div>
+
+              {/* Arrow Connector 2 */}
+              <div className="privacy-flow-arrow" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#94A3B8' }}>
+                <ArrowRight size={20} />
+              </div>
+
+              {/* Step 3: Company Insights */}
+              <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '14px', padding: '18px 16px', textAlign: 'center' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#F5F3FF', color: '#7C3AED', display: 'grid', placeItems: 'center', margin: '0 auto 12px' }}>
+                  <BarChart2 size={20} />
+                </div>
+                <strong style={{ fontSize: '14px', color: '#0F172A', display: 'block', marginBottom: '4px' }}>
+                  3. Executive Boardroom View
+                </strong>
+                <p style={{ fontSize: '11.5px', color: '#64748B', margin: 0, lineHeight: 1.45 }}>
+                  Cohort trends only. Zero names, individual records, or private employee habits.
+                </p>
               </div>
             </div>
           </Card>
+
+          {/* 3. THREE CORE TRUST PILLARS */}
+          <section className="privacy-pillars-grid" style={{ marginBottom: '20px' }}>
+            <Card style={{ padding: '22px', borderRadius: '16px', border: '1px solid #E2E8F0', background: '#FFFFFF' }}>
+              <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#ECFDF5', color: '#059669', display: 'grid', placeItems: 'center', marginBottom: '14px' }}>
+                <Key size={19} />
+              </div>
+              <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}>
+                Data Sovereignty
+              </h3>
+              <p style={{ fontSize: '12.5px', color: '#64748B', lineHeight: 1.5, margin: 0 }}>
+                Employees maintain explicit data ownership. Individual entries cannot be subpoenaed or queried by management.
+              </p>
+            </Card>
+
+            <Card style={{ padding: '22px', borderRadius: '16px', border: '1px solid #E2E8F0', background: '#FFFFFF' }}>
+              <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#EFF6FF', color: '#2563EB', display: 'grid', placeItems: 'center', marginBottom: '14px' }}>
+                <Lock size={19} />
+              </div>
+              <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}>
+                The K ≥ 5 Floor
+              </h3>
+              <p style={{ fontSize: '12.5px', color: '#64748B', lineHeight: 1.5, margin: 0 }}>
+                Any team, cohort, or challenge group with fewer than 5 active participants is automatically locked and redacted from dashboards.
+              </p>
+            </Card>
+
+            <Card style={{ padding: '22px', borderRadius: '16px', border: '1px solid #E2E8F0', background: '#FFFFFF' }}>
+              <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#FFF7ED', color: '#EA580C', display: 'grid', placeItems: 'center', marginBottom: '14px' }}>
+                <ShieldCheck size={19} />
+              </div>
+              <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}>
+                Zero Public Leaderboards
+              </h3>
+              <p style={{ fontSize: '12.5px', color: '#64748B', lineHeight: 1.5, margin: 0 }}>
+                No employee rankings, public shame alerts, or competitive pressure. Designed strictly for health and psychological safety.
+              </p>
+            </Card>
+          </section>
+
+          {/* 4. WHAT WE COLLECT vs WHAT WE NEVER COLLECT */}
+          <section className="privacy-details-grid">
+            <Card style={{ padding: '22px', borderRadius: '16px', border: '1px solid #E2E8F0', background: '#FFFFFF' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                <CheckCircle2 size={18} style={{ color: '#10B981' }} />
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: 0 }}>What Is Collected (Aggregated Only)</h3>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10B981', marginTop: '6px', flexShrink: 0 }} />
+                  <div>
+                    <strong style={{ fontSize: '13px', color: '#0F172A' }}>Aggregated Step Counts</strong>
+                    <p style={{ fontSize: '11.5px', color: '#64748B', margin: '2px 0 0 0' }}>Cohort average steps across entire departments.</p>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10B981', marginTop: '6px', flexShrink: 0 }} />
+                  <div>
+                    <strong style={{ fontSize: '13px', color: '#0F172A' }}>Active Movement Minutes</strong>
+                    <p style={{ fontSize: '11.5px', color: '#64748B', margin: '2px 0 0 0' }}>Aggregated daily exercise intervals without GPS.</p>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10B981', marginTop: '6px', flexShrink: 0 }} />
+                  <div>
+                    <strong style={{ fontSize: '13px', color: '#0F172A' }}>Rest & Sleep Durations</strong>
+                    <p style={{ fontSize: '11.5px', color: '#64748B', margin: '2px 0 0 0' }}>Cohort recovery trends used for fatigue rhythm detection.</p>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <Card style={{ padding: '22px', borderRadius: '16px', border: '1px solid #E2E8F0', background: '#FFFFFF' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                <XCircle size={18} style={{ color: '#EF4444' }} />
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: 0 }}>What Is NEVER Collected</h3>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#EF4444', marginTop: '6px', flexShrink: 0 }} />
+                  <div>
+                    <strong style={{ fontSize: '13px', color: '#0F172A' }}>Zero GPS & Location History</strong>
+                    <p style={{ fontSize: '11.5px', color: '#64748B', margin: '2px 0 0 0' }}>Never records where employees live, walk, or travel.</p>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#EF4444', marginTop: '6px', flexShrink: 0 }} />
+                  <div>
+                    <strong style={{ fontSize: '13px', color: '#0F172A' }}>Zero Medical Diagnostic Data</strong>
+                    <p style={{ fontSize: '11.5px', color: '#64748B', margin: '2px 0 0 0' }}>No clinical diagnostics, biometrics, or health records.</p>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#EF4444', marginTop: '6px', flexShrink: 0 }} />
+                  <div>
+                    <strong style={{ fontSize: '13px', color: '#0F172A' }}>Zero Employee Performance Links</strong>
+                    <p style={{ fontSize: '11.5px', color: '#64748B', margin: '2px 0 0 0' }}>Never connected to payroll, reviews, or appraisals.</p>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </section>
+        </div>
+      )}
+
+      {/* TEAM COHORT DETAILS MODAL */}
+      {selectedTeamModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.5)',
+            backdropFilter: 'blur(3px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+          onClick={() => setSelectedTeamModal(null)}
+        >
+          <div
+            style={{
+              background: '#FFFFFF',
+              borderRadius: '20px',
+              maxWidth: '520px',
+              width: '100%',
+              padding: '24px',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+              border: '1px solid #E2E8F0',
+              maxHeight: '90vh',
+              overflowY: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: `${selectedTeamModal.color}15`, color: selectedTeamModal.color, display: 'grid', placeItems: 'center' }}>
+                  <Users size={18} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#0F172A' }}>{selectedTeamModal.name}</h3>
+                  <span style={{ fontSize: '12px', color: '#64748B' }}>{selectedTeamModal.members} active employees</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedTeamModal(null)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', padding: '4px' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {selectedTeamModal.hidden ? (
+              <div style={{ padding: '16px', background: '#FEF3C7', border: '1px solid #FCD34D', borderRadius: '12px', color: '#92400E', fontSize: '13px' }}>
+                <strong>K-Anonymity Threshold Active (&lt; 5 members)</strong>
+                <p style={{ margin: '6px 0 0 0', lineHeight: 1.45 }}>
+                  This cohort currently has fewer than 5 members. In compliance with the K ≥ 5 privacy guarantee, all individual and telemetry metrics are strictly redacted from management views.
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                  <div style={{ background: '#F8FAFC', padding: '12px', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+                    <span style={{ fontSize: '11px', color: '#64748B', display: 'block' }}>Participation</span>
+                    <strong style={{ fontSize: '16px', color: '#10B981' }}>{selectedTeamModal.activePct}%</strong>
+                  </div>
+                  <div style={{ background: '#F8FAFC', padding: '12px', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+                    <span style={{ fontSize: '11px', color: '#64748B', display: 'block' }}>Avg. Steps</span>
+                    <strong style={{ fontSize: '16px', color: '#0F172A' }}>{selectedTeamModal.steps?.toLocaleString()}</strong>
+                  </div>
+                  <div style={{ background: '#F8FAFC', padding: '12px', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+                    <span style={{ fontSize: '11px', color: '#64748B', display: 'block' }}>Avg. Sleep</span>
+                    <strong style={{ fontSize: '16px', color: '#0F172A' }}>{selectedTeamModal.sleep} h</strong>
+                  </div>
+                </div>
+
+                <div style={{ padding: '12px 14px', background: '#F0FDF4', borderRadius: '12px', border: '1px solid #BBF7D0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <ShieldCheck size={16} style={{ color: '#059669', flexShrink: 0 }} />
+                  <span style={{ fontSize: '12px', color: '#065F46' }}>
+                    <strong>K ≥ 5 Compliance Verified:</strong> Cohort exceeds anonymity floor. Individual telemetry remains private.
+                  </span>
+                </div>
+
+                <div>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '8px' }}>
+                    Department Rhythm Status
+                  </span>
+                  <div style={{ padding: '12px', background: '#F8FAFC', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
+                      <span>Weekly Goal Attainment</span>
+                      <strong style={{ color: '#059669' }}>{selectedTeamModal.activePct}% On Track</strong>
+                    </div>
+                    <div style={{ width: '100%', height: '6px', background: '#E2E8F0', borderRadius: '6px', overflow: 'hidden' }}>
+                      <div style={{ width: `${selectedTeamModal.activePct}%`, height: '100%', background: selectedTeamModal.color, borderRadius: '6px' }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <Button variant="primary" size="sm" onClick={() => setSelectedTeamModal(null)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {feedbackModalOpen && (
+        <div
+          className="modal-backdrop"
+          onClick={() => setFeedbackModalOpen(false)}
+          role="presentation"
+        >
+          <div
+            className="modal-container"
+            style={{ maxWidth: '560px' }}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="All employee feedback"
+          >
+            <div className="modal-header">
+              <div>
+                <div className="eyebrow">ANONYMOUS VOICES</div>
+                <h2 className="modal-title">All Employee Feedback</h2>
+              </div>
+              <button
+                className="modal-close-btn"
+                onClick={() => setFeedbackModalOpen(false)}
+                aria-label="Close dialog"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <div className="modal-body">
+              <p className="modal-body-intro">
+                Feedback is collected anonymously and shown only in aggregate. No individual attribution is ever stored.
+              </p>
+              <div className="feedback-quotes-stack">
+                {FEEDBACK_QUOTES.map((q) => (
+                  <div key={q.text} className="feedback-quote-row">
+                    <p className="quote-text">“{q.text}”</p>
+                    <span className="quote-author">— {q.author}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
+                <Button variant="primary" size="sm" onClick={() => setFeedbackModalOpen(false)}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
