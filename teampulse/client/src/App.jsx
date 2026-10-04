@@ -27,7 +27,8 @@ import {
   ArrowRight,
   Sparkles,
   Sprout,
-  X
+  X,
+  LogOut
 } from 'lucide-react';
 import './styles.css';
 
@@ -39,6 +40,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotif, setShowNotif] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [hash, setHash] = useState(window.location.hash);
 
   function handleSearchKeyDown(e) {
@@ -107,21 +109,29 @@ export default function App() {
         rescue,
         team: team || { name: 'Product Engineering' }
       });
+      const currentRole = activeUser?.role || localStorage.getItem('role') || 'employee';
+      if (currentRole === 'hr' && (page === 'home' || !page) && !window.location.hash) {
+        setPage('overview');
+      }
       setSetup(false);
     } catch (err) {
       console.warn('Session or data issue:', err.message);
+      const fallbackRole = localStorage.getItem('role') || 'employee';
       setData({
         me: {
           _id: 'demo-user-1',
-          name: 'Alex Morgan',
-          email: 'alex@acme.com',
-          role: localStorage.getItem('role') || 'hr',
+          name: fallbackRole === 'hr' ? 'Sarah Jenkins' : 'Alex Morgan',
+          email: fallbackRole === 'hr' ? 'hr@acme.com' : 'alex@acme.com',
+          role: fallbackRole,
           company: 'Acme Corp',
           team: { name: 'Product Engineering' }
         },
         week: { metrics: [], streak: 14, goal: 8000 },
         team: { name: 'Product Engineering' }
       });
+      if (fallbackRole === 'hr' && (page === 'home' || !page) && !window.location.hash) {
+        setPage('overview');
+      }
       setSetup(false);
     } finally {
       setLoading(false);
@@ -141,6 +151,8 @@ export default function App() {
     setAuth(false);
     setData({});
     setPage('home');
+    setShowProfileMenu(false);
+    setShowNotif(false);
   }
 
   if (loading) {
@@ -166,12 +178,22 @@ export default function App() {
   }
 
   if (!auth) {
-    return <Login onDone={() => { setAuth(true); setLoading(true); }} />;
+    return (
+      <Login
+        onDone={(res) => {
+          setAuth(true);
+          setLoading(true);
+          if (res?.role === 'hr') {
+            setPage('overview');
+          }
+        }}
+      />
+    );
   }
 
   const role = data.me?.role || localStorage.getItem('role') || 'employee';
-  const userName = data.me?.name || 'Alex';
-  const firstName = userName.split(' ')[0] || 'Alex';
+  const userName = data.me?.name || (role === 'hr' ? 'Sarah Jenkins' : 'Alex Morgan');
+  const firstName = userName.split(' ')[0] || (role === 'hr' ? 'Sarah' : 'Alex');
   const userRole = role === 'hr' ? 'HR Admin' : 'Employee';
 
   const employeeNav = [
@@ -194,54 +216,56 @@ export default function App() {
     <div className="tl-app-layout">
       {/* SIDEBAR NAVIGATION */}
       <aside className="tl-sidebar">
-        <div className="tl-sidebar-brand" onClick={() => setPage('home')} style={{ cursor: 'pointer' }}>
+        <div className="tl-sidebar-brand" onClick={() => setPage(role === 'hr' ? 'overview' : 'home')} style={{ cursor: 'pointer' }}>
           <ThriveLoopLogo size={28} showText={true} />
         </div>
 
-        {/* Section 1: Employee */}
-        <div className="tl-nav-section">
-          <div className="tl-nav-list">
-            {employeeNav.map((item) => {
-              const Icon = item.icon;
-              const isActive = page === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`tl-nav-link ${isActive ? 'active' : ''}`}
-                  onClick={() => setPage(item.id)}
-                >
-                  <Icon size={18} className="tl-nav-icon" />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
+        {/* Role-based navigation */}
+        {role === 'hr' ? (
+          <div className="tl-nav-section">
+            <span className="tl-nav-header">HR (Admin)</span>
+            <div className="tl-nav-list">
+              {hrNav.map((item) => {
+                const Icon = item.icon;
+                const isActive = page === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={`tl-nav-link ${isActive ? 'active' : ''}`}
+                    onClick={() => setPage(item.id)}
+                  >
+                    <Icon size={18} className="tl-nav-icon" />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
-
-        {/* Section 2: HR (Admin) */}
-        <div className="tl-nav-section">
-          <span className="tl-nav-header">HR (Admin)</span>
-          <div className="tl-nav-list">
-            {hrNav.map((item) => {
-              const Icon = item.icon;
-              const isActive = page === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`tl-nav-link ${isActive ? 'active' : ''}`}
-                  onClick={() => setPage(item.id)}
-                >
-                  <Icon size={18} className="tl-nav-icon" />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
+        ) : (
+          <div className="tl-nav-section">
+            <span className="tl-nav-header">My Wellness</span>
+            <div className="tl-nav-list">
+              {employeeNav.map((item) => {
+                const Icon = item.icon;
+                const isActive = page === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={`tl-nav-link ${isActive ? 'active' : ''}`}
+                    onClick={() => setPage(item.id)}
+                  >
+                    <Icon size={18} className="tl-nav-icon" />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Bottom Sidebar Tile: Green Plant Botanical Card */}
+        {/* Bottom Sidebar Tile: Botanical Card */}
         <div className="tl-sidebar-card">
           <div className="tl-sidebar-card-plant">
             <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
@@ -251,22 +275,49 @@ export default function App() {
               <path d="M24 30C28 26 38 24 38 24C38 24 32 30 28 34C26 36 24 44 24 44" fill="#059669" fillOpacity="0.4"/>
             </svg>
           </div>
-          <div className="tl-sidebar-card-title">Small Changes Big Impact</div>
-          <p className="tl-sidebar-card-desc">Healthier people. Stronger teams. Brighter tomorrows.</p>
-          <button
-            type="button"
-            className="tl-sidebar-card-btn"
-            onClick={() => setPage('challenge')}
-          >
-            Start a Challenge →
-          </button>
+          {role === 'hr' ? (
+            <>
+              <div className="tl-sidebar-card-title">Collective Wellbeing</div>
+              <p className="tl-sidebar-card-desc">Healthy cultures drive sustainable performance.</p>
+              <button
+                type="button"
+                className="tl-sidebar-card-btn"
+                onClick={() => setPage('impact')}
+              >
+                View Impact →
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="tl-sidebar-card-title">Small Changes Big Impact</div>
+              <p className="tl-sidebar-card-desc">Healthier people. Stronger teams. Brighter tomorrows.</p>
+              <button
+                type="button"
+                className="tl-sidebar-card-btn"
+                onClick={() => setPage('challenge')}
+              >
+                Start a Challenge →
+              </button>
+            </>
+          )}
         </div>
       </aside>
 
       {/* MAIN CONTENT AREA */}
       <main className="tl-main-area">
-        {/* GLOBAL TOPBAR: Search + Notifications + Profile */}
+        {/* GLOBAL TOPBAR: Mobile Logo + Search + Notifications + Profile */}
         <header className="tl-topbar">
+          <div
+            className="tl-mobile-brand"
+            onClick={() => setPage(role === 'hr' ? 'overview' : 'home')}
+            style={{ cursor: 'pointer' }}
+            title="ThriveLoop"
+            role="button"
+            tabIndex={0}
+          >
+            <ThriveLoopLogo size={24} showText={false} />
+          </div>
+
           <div className="tl-topbar-search">
             <Search size={16} className="tl-search-icon" />
             <input
@@ -284,7 +335,10 @@ export default function App() {
               type="button"
               className="tl-notif-btn"
               title="Notifications"
-              onClick={() => setShowNotif((prev) => !prev)}
+              onClick={() => {
+                setShowNotif((prev) => !prev);
+                setShowProfileMenu(false);
+              }}
             >
               <Bell size={18} />
               <span className="tl-notif-dot">2</span>
@@ -363,11 +417,16 @@ export default function App() {
               </div>
             )}
 
+            {/* Profile User Pill */}
             <div
               className="tl-user-pill"
-              onClick={() => setPage('profile')}
+              onClick={() => {
+                setShowProfileMenu((prev) => !prev);
+                setShowNotif(false);
+              }}
               role="button"
               tabIndex={0}
+              aria-label="User Profile Menu"
             >
               <img
                 src={getMemberAvatar(0, userName)}
@@ -380,6 +439,143 @@ export default function App() {
                 <span className="tl-user-role">{userRole} <ChevronDown size={12} className="inline-chevron" /></span>
               </div>
             </div>
+
+            {/* Profile Dropdown Menu Flyout */}
+            {showProfileMenu && (
+              <div
+                className="tl-profile-menu-dropdown"
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '10px',
+                  width: '260px',
+                  background: '#FFFFFF',
+                  borderRadius: '16px',
+                  border: '1px solid #E2E8F0',
+                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05)',
+                  padding: '16px',
+                  zIndex: 1001,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '12px'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingBottom: '12px', borderBottom: '1px solid #F1F5F9' }}>
+                  <img
+                    src={getMemberAvatar(0, userName)}
+                    alt={userName}
+                    style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover' }}
+                    onError={(e) => handleAvatarError(e, userName)}
+                  />
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {userName}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 600, color: role === 'hr' ? '#7C3AED' : '#059669', background: role === 'hr' ? '#F5F3FF' : '#ECFDF5', padding: '1px 7px', borderRadius: '10px' }}>
+                        {userRole}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <button
+                    type="button"
+                    className="tl-menu-action-btn"
+                    onClick={() => {
+                      setPage('profile');
+                      setShowProfileMenu(false);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '9px 12px',
+                      background: 'none',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      color: '#1E293B',
+                      textAlign: 'left',
+                      width: '100%'
+                    }}
+                  >
+                    <User size={16} style={{ color: '#64748B' }} />
+                    <span>My Profile</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="tl-menu-action-btn"
+                    onClick={() => {
+                      const newRole = role === 'hr' ? 'employee' : 'hr';
+                      localStorage.setItem('role', newRole);
+                      setData((prev) => ({
+                        ...prev,
+                        me: {
+                          ...prev.me,
+                          role: newRole,
+                          name: newRole === 'hr' ? 'Sarah Jenkins' : 'Alex Morgan',
+                          email: newRole === 'hr' ? 'hr@acme.com' : 'alex@acme.com'
+                        }
+                      }));
+                      setPage(newRole === 'hr' ? 'overview' : 'home');
+                      setShowProfileMenu(false);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '9px 12px',
+                      background: '#F8FAFC',
+                      border: '1px solid #E2E8F0',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '12.5px',
+                      fontWeight: 600,
+                      color: '#0F172A',
+                      textAlign: 'left',
+                      width: '100%',
+                      margin: '4px 0'
+                    }}
+                  >
+                    {role === 'hr' ? <Users size={16} style={{ color: '#10B981' }} /> : <BarChart2 size={16} style={{ color: '#7C3AED' }} />}
+                    <span>Switch to {role === 'hr' ? 'Employee (Alex)' : 'HR Admin (Sarah)'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="tl-menu-action-btn"
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      handleLogout();
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '9px 12px',
+                      background: 'none',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      color: '#EF4444',
+                      textAlign: 'left',
+                      width: '100%'
+                    }}
+                  >
+                    <LogOut size={16} style={{ color: '#EF4444' }} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </header>
 
@@ -393,7 +589,7 @@ export default function App() {
               challenge={data.challenge}
               teamMembers={data.team?.members || []}
               onRefresh={loadData}
-              onBack={() => setPage('home')}
+              onBack={() => setPage(role === 'hr' ? 'overview' : 'home')}
               onNavigate={setPage}
             />
           )}
@@ -401,7 +597,7 @@ export default function App() {
             <Rescue
               data={data}
               onRefresh={loadData}
-              onBack={() => setPage('home')}
+              onBack={() => setPage(role === 'hr' ? 'overview' : 'home')}
             />
           )}
           {page === 'team' && (
@@ -411,13 +607,35 @@ export default function App() {
             <Profile me={data.me} onLogout={handleLogout} />
           )}
           {page === 'privacy' && (
-            <Privacy onBack={() => setPage('home')} />
+            <Privacy onBack={() => setPage(role === 'hr' ? 'overview' : 'home')} />
           )}
           {['overview', 'teams', 'impact', 'roi'].includes(page) && (
             <HR defaultTab={page} onNavigate={setPage} />
           )}
         </div>
       </main>
+
+      {/* MOBILE BOTTOM NAVIGATION BAR */}
+      <nav className="tl-mobile-bottom-nav" aria-label="Mobile Navigation">
+        {(role === 'hr' ? hrNav : employeeNav).map((item) => {
+          const Icon = item.icon;
+          const isActive = page === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              className={`tl-mobile-nav-item ${isActive ? 'active' : ''}`}
+              onClick={() => {
+                setPage(item.id);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            >
+              <Icon size={20} className="tl-mobile-nav-icon" />
+              <span className="tl-mobile-nav-label">{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }
