@@ -44,8 +44,9 @@ export default function App() {
   const [hash, setHash] = useState(window.location.hash);
 
   function handleSearchKeyDown(e) {
-    if (e.key === 'Enter' && searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
+    if (e.key === 'Enter') {
+      const q = (e.target.value || searchQuery || '').toLowerCase().trim();
+      if (!q) return;
       if (q.includes('chall') || q.includes('step')) setPage('challenge');
       else if (q.includes('rescu') || q.includes('habit')) setPage('rescue');
       else if (q.includes('team') || q.includes('squad')) setPage('team');
