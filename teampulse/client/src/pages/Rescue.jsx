@@ -158,14 +158,17 @@ export function Rescue({ data, onRefresh, onBack }) {
               </button>
             )}
 
+            {/* Status, not a control: this was a <button> with no handler, so
+                it was focusable and announced as an action that did nothing.
+                The completed state already renders its own pill below. */}
             {rescueState === 'completed' && (
-              <button
-                type="button"
+              <div
                 className="tl-btn-rescue-primary completed-state"
+                role="status"
               >
                 <CheckCircle2 size={16} />
                 <span>Rescue Completed</span>
-              </button>
+              </div>
             )}
 
             <button

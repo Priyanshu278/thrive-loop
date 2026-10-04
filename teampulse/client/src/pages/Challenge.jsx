@@ -409,7 +409,11 @@ export function Challenge({ challenge, teamMembers = [], onRefresh, onBack, onNa
                       className="member-row-avatar"
                       onError={(e) => handleAvatarError(e, m.name)}
                     />
-                    <span className="member-row-name">{m.name}</span>
+                    {/* Long names ellipsize in the fixed-width row on narrow screens, so
+                        expose the full value for hover/long-press. */}
+                    <span className="member-row-name" title={m.name}>
+                      {m.name}
+                    </span>
                     <span style={{ marginLeft: 'auto', fontSize: '12px', background: '#ECFDF5', color: '#059669', padding: '3px 8px', borderRadius: '12px', fontWeight: 600 }}>
                       {m.status || 'Active in Squad'}
                     </span>
