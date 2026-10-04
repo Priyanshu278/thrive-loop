@@ -314,7 +314,11 @@ export function Team({ data, onNavigate }) {
                       className="member-avatar-img"
                       onError={(e) => handleAvatarError(e, m.name)}
                     />
-                    <span className="member-display-name">{m.name}</span>
+                    {/* Long names ellipsize in the fixed-width roster row on narrow
+                        screens, so expose the full value for hover/long-press. */}
+                    <span className="member-display-name" title={m.name}>
+                      {m.name}
+                    </span>
                     <span style={{ marginLeft: 'auto', fontSize: '11.5px', background: '#ECFDF5', color: '#059669', padding: '2px 8px', borderRadius: '10px', fontWeight: 600 }}>
                       {m.status || 'Active in Squad'}
                     </span>

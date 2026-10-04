@@ -41,6 +41,38 @@ export function Profile({ me, onLogout }) {
   const [profileAvatarIdx, setProfileAvatarIdx] = useState(0);
   const [savedToast, setSavedToast] = useState(false);
 
+  // The edit overlay writes straight into profileName/Dept/Location/AvatarIdx,
+  // which are also what the profile card renders. Without a committed
+  // snapshot, "Cancel" only closed the dialog and still left the typed value
+  // applied to the live profile. Keep the last-saved values so Cancel can
+  // genuinely discard the draft.
+  const [committedProfile, setCommittedProfile] = useState({
+    name: me?.name || 'Alex Morgan',
+    dept: 'Product Team',
+    location: 'Indore, India',
+    avatarIdx: 0,
+  });
+
+  function cancelEditProfile() {
+    setProfileName(committedProfile.name);
+    setProfileDept(committedProfile.dept);
+    setProfileLocation(committedProfile.location);
+    setProfileAvatarIdx(committedProfile.avatarIdx);
+    setIsEditModalOpen(false);
+  }
+
+  function saveEditProfile() {
+    setCommittedProfile({
+      name: profileName,
+      dept: profileDept,
+      location: profileLocation,
+      avatarIdx: profileAvatarIdx,
+    });
+    setIsEditModalOpen(false);
+    setSavedToast(true);
+    setTimeout(() => setSavedToast(false), 3000);
+  }
+
   const userName = profileName;
   const userEmail = me?.email || 'alex@company.com';
 
@@ -734,18 +766,14 @@ export function Profile({ me, onLogout }) {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setIsEditModalOpen(false)}
+                  onClick={cancelEditProfile}
                 >
                   Cancel
                 </Button>
                 <Button
                   variant="primary"
                   size="sm"
-                  onClick={() => {
-                    setIsEditModalOpen(false);
-                    setSavedToast(true);
-                    setTimeout(() => setSavedToast(false), 3000);
-                  }}
+                  onClick={saveEditProfile}
                 >
                   Save Changes
                 </Button>
