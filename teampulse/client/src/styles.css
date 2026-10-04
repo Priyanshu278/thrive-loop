@@ -10561,3 +10561,39 @@ button.widget-subtitle-pill.as-button:focus-visible {
   pointer-events: none;
   user-select: none;
 }
+
+/* ==========================================================================
+   FIX: grid tracks overflowing their container on narrow viewports.
+   `1fr` is shorthand for `minmax(auto, 1fr)`, and `auto` refuses to shrink
+   below the content's min-content size. That let rescue cards resolve to
+   349px inside a 311px parent and pushed the whole page sideways.
+   `minmax(0, 1fr)` allows the track to shrink, which is what we want.
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .tl-rescue-tri-row,
+  .tl-rescue-tri-row-2,
+  .tl-rescue-bottom-row,
+  .tl-rescue-hero-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Belt-and-braces: let any grid/flex child shrink instead of forcing the
+   parent wider than the viewport. */
+.tl-rescue-card,
+.tl-rescue-tri-row > *,
+.tl-rescue-tri-row-2 > *,
+.tl-rescue-bottom-row > * {
+  min-width: 0;
+}
+
+/* Same class of bug elsewhere: defensive min-width reset for the main
+   content grids used across Home, Team, Profile and HR. */
+.home-tri-column-grid > *,
+.home-bottom-recommendations-grid > *,
+.hero-metrics-quad,
+.profile-master-grid > *,
+.hr-tab-container *,
+.teams-directory-grid > * {
+  min-width: 0;
+}

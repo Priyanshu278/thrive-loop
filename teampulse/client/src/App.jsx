@@ -39,6 +39,9 @@ export default function App() {
   const [setup, setSetup] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isCompact, setIsCompact] = useState(
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches
+  );
   const [showNotif, setShowNotif] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [hash, setHash] = useState(window.location.hash);
@@ -146,6 +149,16 @@ export default function App() {
       setLoading(false);
     }
   }, [auth]);
+
+  // FIX: the search placeholder is far too long for a 360px viewport and was
+  // clipped mid-word. Swap in a short label on compact screens.
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 640px)');
+    const sync = () => setIsCompact(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
 
   function handleLogout() {
     localStorage.clear();
@@ -323,7 +336,7 @@ export default function App() {
             <Search size={16} className="tl-search-icon" />
             <input
               type="text"
-              placeholder="Search habits, challenges, teams... (Press Enter)"
+              placeholder={isCompact ? 'Search…' : 'Search habits, challenges, teams... (Press Enter)'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleSearchKeyDown}
