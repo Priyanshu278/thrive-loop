@@ -32,6 +32,15 @@ import {
 
 import { getMemberAvatar, handleAvatarError } from '../utils/avatars';
 
+// role="button" rows are focusable, so Enter and Space have to activate them
+// the way a real <button> would — otherwise the keyboard path is dead.
+function onRowKeyActivate(e, activate) {
+  if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+    e.preventDefault();
+    activate();
+  }
+}
+
 export function Home({ data, onRefresh, onNavigate }) {
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [activeMetricModal, setActiveMetricModal] = useState(null); // 'steps' | 'active' | 'sleep' | null
@@ -749,6 +758,7 @@ export function Home({ data, onRefresh, onNavigate }) {
               className="insight-row-item"
               style={{ cursor: 'pointer' }}
               onClick={() => setActiveMetricModal('steps')}
+              onKeyDown={(e) => onRowKeyActivate(e, () => setActiveMetricModal('steps'))}
               title="Click to view Steps analytics"
               role="button"
               tabIndex={0}
@@ -767,6 +777,7 @@ export function Home({ data, onRefresh, onNavigate }) {
               className="insight-row-item"
               style={{ cursor: 'pointer' }}
               onClick={() => setActiveMetricModal('sleep')}
+              onKeyDown={(e) => onRowKeyActivate(e, () => setActiveMetricModal('sleep'))}
               title="Click to view Sleep analytics"
               role="button"
               tabIndex={0}
@@ -785,6 +796,7 @@ export function Home({ data, onRefresh, onNavigate }) {
               className="insight-row-item"
               style={{ cursor: 'pointer' }}
               onClick={() => setActiveMetricModal('active')}
+              onKeyDown={(e) => onRowKeyActivate(e, () => setActiveMetricModal('active'))}
               title="Click to view Activity analytics"
               role="button"
               tabIndex={0}
