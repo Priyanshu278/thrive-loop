@@ -10,10 +10,15 @@ const STATUS_FALLBACKS = {
   500: 'Server error',
 };
 
+const API_BASE = import.meta.env.VITE_API_URL
+  ? import.meta.env.VITE_API_URL.replace(/\/+$/, '')
+  : '';
+
 export async function api(path, method = 'GET', body) {
   let res;
+  const url = API_BASE ? `${API_BASE}/api${path}` : `/api${path}`;
   try {
-    res = await fetch('/api' + path, {
+    res = await fetch(url, {
       method,
       headers: {
         'Content-Type': 'application/json',
