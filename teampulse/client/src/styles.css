@@ -9711,12 +9711,18 @@ button {
 
 /* Print-ready styles for Executive Boardroom One-Pager */
 @media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
   body * {
     visibility: hidden;
   }
   .hr-master-layout,
   .hr-master-layout * {
     visibility: visible;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
   .sidebar,
   .top-search-bar,
@@ -9731,6 +9737,15 @@ button {
     width: 100%;
     margin: 0;
     padding: 0;
+  }
+  /* Keep KPI cards, charts and tables intact across page breaks */
+  .card,
+  .telemetry-stat-card,
+  .hr-5-kpis-grid section,
+  .hr-dual-charts-grid section,
+  table {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 }
 
