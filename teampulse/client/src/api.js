@@ -10,9 +10,10 @@ const STATUS_FALLBACKS = {
   500: 'Server error',
 };
 
-const API_BASE = import.meta.env.VITE_API_URL
-  ? import.meta.env.VITE_API_URL.replace(/\/+$/, '')
-  : '';
+const API_BASE = (
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? '' : 'https://thrive-loop.onrender.com')
+).replace(/\/+$/, '');
 
 export async function api(path, method = 'GET', body) {
   let res;
