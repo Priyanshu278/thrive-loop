@@ -84,7 +84,7 @@ export function Home({ data, onRefresh, onNavigate }) {
   const sleepActual = todayData?.sleepHours || 7.8;
   const sleepGoal = 8;
   const sleepPct = Math.min(100, Math.round((sleepActual / sleepGoal) * 100));
-  const sleepHours = todayData?.sleepHours ? `${todayData.sleepHours} h` : '7.8 h';
+  const sleepHours = todayData?.sleepHours ? `${Math.round(todayData.sleepHours * 10) / 10} h` : '7.8 h';
 
   const overallRingsPct = Math.round((stepsPct + activeMinPct + sleepPct) / 3);
 

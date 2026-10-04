@@ -122,7 +122,9 @@ export function MetricAnalyticsModal({
       unit: 'hours',
       tabTodayLabel: 'Last Night',
       currentValue: data.sleepHours || 7.8,
-      formattedCurrent: `${data.sleepHours || 7.8}`,
+      // Round to one decimal: the API returns float32 sleepHours, whose raw
+      // String() form (7.800000190734863) would leak into the modal.
+      formattedCurrent: `${Math.round((data.sleepHours || 7.8) * 10) / 10}`,
       goal: data.sleepGoal || 8,
       formattedGoal: `${data.sleepGoal || 8} hours`,
       pct: Math.min(100, Math.round(((data.sleepHours || 7.8) / (data.sleepGoal || 8)) * 100)),

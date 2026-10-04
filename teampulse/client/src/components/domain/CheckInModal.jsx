@@ -6,7 +6,13 @@ import { api } from '../../api';
 
 export function CheckInModal({ isOpen, onClose, currentToday, onSaved }) {
   const [steps, setSteps] = useState(currentToday?.steps ? String(currentToday.steps) : '6000');
-  const [sleep, setSleep] = useState(currentToday?.sleepHours ? String(currentToday.sleepHours) : '7.5');
+  // sleepHours arrives from the API as a float32, so it can come back as
+  // 7.800000190734863. String() on that shows the raw binary artifact in the
+  // input and breaks the `Number(sleep) === preset` highlight match, so round
+  // to the one decimal the field actually accepts.
+  const [sleep, setSleep] = useState(
+    currentToday?.sleepHours ? String(Math.round(currentToday.sleepHours * 10) / 10) : '7.5'
+  );
   const [saving, setSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [error, setError] = useState('');
