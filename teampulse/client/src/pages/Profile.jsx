@@ -407,14 +407,14 @@ export function Profile({ me, onLogout }) {
                   <Clock size={16} style={{ color: '#3B82F6' }} />
                   <h3 className="card-main-title">Recent Activity</h3>
                 </div>
-                <span
+                <button
+                  type="button"
                   className="header-view-link"
                   onClick={() => setActivityModalOpen(true)}
-                  style={{ cursor: 'pointer' }}
                   title="View full activity log"
                 >
                   See All →
-                </span>
+                </button>
               </div>
 
               <div className="profile-recent-list">
@@ -448,14 +448,14 @@ export function Profile({ me, onLogout }) {
                   <Award size={16} style={{ color: '#10B981' }} />
                   <h3 className="card-main-title">Achievements</h3>
                 </div>
-                <span
+                <button
+                  type="button"
                   className="header-view-link"
                   onClick={() => setAchievementsModalOpen(true)}
-                  style={{ cursor: 'pointer' }}
                   title="View all badges and unlocked milestones"
                 >
                   View All →
-                </span>
+                </button>
               </div>
 
               <div className="achievements-triplet-row">
@@ -511,14 +511,14 @@ export function Profile({ me, onLogout }) {
                 <Target size={16} style={{ color: '#3B82F6' }} />
                 <h3 className="card-main-title">Upcoming Goals</h3>
               </div>
-              <span
+              <button
+                type="button"
                 className="header-view-link"
                 onClick={() => setActiveTab('goals')}
-                style={{ cursor: 'pointer' }}
                 title="Manage personal goals"
               >
                 View All →
-              </span>
+              </button>
             </div>
 
             <div className="goals-vertical-list">

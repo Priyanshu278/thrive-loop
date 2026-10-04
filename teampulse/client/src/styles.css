@@ -10425,3 +10425,139 @@ button {
     flex: 0 0 auto;
   }
 }
+
+/* FIX: HR "This Week" range filter — was a static <span> that did nothing.
+   Now a real button with an accessible dropdown menu. */
+.hr-sub-filter-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.header-sub-filter.as-button {
+  border: 1px solid #E2E8F0;
+  background: #F8FAFC;
+  border-radius: 9999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.header-sub-filter.as-button:hover {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+}
+
+.header-sub-filter.as-button:focus-visible {
+  outline: 2px solid #10B981;
+  outline-offset: 2px;
+}
+
+.hr-sub-filter-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 40;
+  min-width: 150px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 12px 28px -8px rgba(15, 23, 42, 0.18);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hr-sub-filter-option {
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s ease;
+}
+
+.hr-sub-filter-option:hover {
+  background: #F1F5F9;
+}
+
+.hr-sub-filter-option.active {
+  background: #ECFDF5;
+  color: #047857;
+  font-weight: 700;
+}
+
+.modal-body-intro {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: #64748B;
+  line-height: 1.5;
+}
+
+/* FIX: header view links were <span> elements; make the button reset explicit
+   so wired links do not inherit default button chrome. */
+button.header-view-link,
+button.widget-view-link {
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  color: #047857;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+button.header-view-link:hover,
+button.widget-view-link:hover {
+  color: #059669;
+  text-decoration: underline;
+}
+
+button.header-view-link:focus-visible,
+button.widget-view-link:focus-visible {
+  outline: 2px solid #10B981;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* FIX: insights "This Week" pill was a <span> with onClick — not focusable and
+   below touch-target size. Reset it to button chrome while keeping the pill look. */
+button.widget-subtitle-pill.as-button {
+  border: 1px solid #E2E8F0;
+  background: #F8FAFC;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  min-height: 32px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+button.widget-subtitle-pill.as-button:hover {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+}
+
+button.widget-subtitle-pill.as-button:focus-visible {
+  outline: 2px solid #10B981;
+  outline-offset: 2px;
+}
+
+/* Keep decorative card arrows out of the tab order: the whole card is the
+   click target, so the glyph must not read as its own control. */
+.rec-action-arrow {
+  pointer-events: none;
+  user-select: none;
+}

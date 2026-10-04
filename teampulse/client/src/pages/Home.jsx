@@ -577,9 +577,9 @@ export function Home({ data, onRefresh, onNavigate }) {
                 <Award size={16} style={{ color: '#F59E0B' }} />
                 <h3 className="widget-title">Upcoming Challenges</h3>
               </div>
-              <span className="widget-view-link" onClick={() => onNavigate('challenge')}>
+              <button type="button" className="widget-view-link" onClick={() => onNavigate('challenge')}>
                 View All →
-              </span>
+              </button>
             </div>
 
             <div className="challenges-mini-list">
@@ -618,7 +618,13 @@ export function Home({ data, onRefresh, onNavigate }) {
                 <Users size={16} style={{ color: '#10B981' }} />
                 <h3 className="widget-title">Your Team</h3>
               </div>
-              <span className="widget-view-link">View All →</span>
+              <button
+                type="button"
+                className="widget-view-link"
+                onClick={() => onNavigate('team')}
+              >
+                View All →
+              </button>
             </div>
 
             <div className="team-avatars-row">
@@ -665,9 +671,9 @@ export function Home({ data, onRefresh, onNavigate }) {
               <Sparkles size={17} style={{ color: '#F59E0B' }} />
               <h2 className="card-main-title">Recommended for You</h2>
             </div>
-            <span className="widget-view-link" onClick={() => onNavigate('challenge')}>
+            <button type="button" className="widget-view-link" onClick={() => onNavigate('challenge')}>
               View All →
-            </span>
+            </button>
           </div>
 
           <div className="recommendations-cards-row">
@@ -690,7 +696,7 @@ export function Home({ data, onRefresh, onNavigate }) {
                     <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=60&q=80" alt="user" />
                     <span>1.2K joined</span>
                   </div>
-                  <div className="rec-action-arrow">→</div>
+                  <div className="rec-action-arrow" aria-hidden="true">→</div>
                 </div>
               </div>
             </div>
@@ -714,7 +720,7 @@ export function Home({ data, onRefresh, onNavigate }) {
                     <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=60&q=80" alt="user" />
                     <span>858 joined</span>
                   </div>
-                  <div className="rec-action-arrow">→</div>
+                  <div className="rec-action-arrow" aria-hidden="true">→</div>
                 </div>
               </div>
             </div>
@@ -728,14 +734,14 @@ export function Home({ data, onRefresh, onNavigate }) {
               <Lightbulb size={17} style={{ color: '#10B981' }} />
               <h2 className="card-main-title">Insights for You</h2>
             </div>
-            <span
-              className="widget-subtitle-pill"
-              style={{ cursor: 'pointer' }}
+            <button
+              type="button"
+              className="widget-subtitle-pill as-button"
               onClick={() => setActiveMetricModal('steps')}
               title="Click to view weekly telemetry"
             >
               This Week ▾
-            </span>
+            </button>
           </div>
 
           <div className="insights-vertical-list">

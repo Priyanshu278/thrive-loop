@@ -107,6 +107,24 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
     { id: 'quarter', label: 'This Quarter', factor: 1.14 },
   ];
   const deptRangeLabel = (DEPT_RANGES.find((r) => r.id === deptRange) || DEPT_RANGES[0]).label;
+  const deptRangeFactor = (DEPT_RANGES.find((r) => r.id === deptRange) || DEPT_RANGES[0]).factor;
+
+  const DEPT_PARTICIPATION = [
+    { dot: '#10B981', name: 'Product Team', pct: 88 },
+    { dot: '#3B82F6', name: 'Development', pct: 87 },
+    { dot: '#8B5CF6', name: 'Design Team', pct: 82 },
+    { dot: '#F59E0B', name: 'Marketing', pct: 80 },
+    { dot: '#06B6D4', name: 'Operations', pct: 77 },
+  ];
+
+  const FEEDBACK_QUOTES = [
+    { text: 'I feel more energetic and focused throughout the day.', author: 'Priya S., Product Team' },
+    { text: 'Habit Rescue has helped our team stay connected even on busy days.', author: 'Rahul K., Development' },
+    { text: "It's a simple but effective way to build healthier habits together.", author: 'Neha M., Design Team' },
+    { text: 'The weekly team challenge gave us a reason to step away from our desks.', author: 'Karan V., Operations' },
+    { text: 'I actually look forward to the weekly check-in now.', author: 'Ananya T., Design Team' },
+    { text: 'Sleep scores finally feel like something I can act on.', author: 'Vikram S., Development' },
+  ];
   const [roiCostPerResignation, setRoiCostPerResignation] = useState(15000);
   const [roiCurrency, setRoiCurrency] = useState('USD');
   const [roiPreset, setRoiPreset] = useState('mid');
@@ -244,6 +262,28 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
     return matchesCat && matchesSearch;
   });
 
+  // FIX: the directory filter chips used hardcoded headcounts ("All Teams (248)")
+  // that contradicted the cards actually rendered below them. Derive every
+  // count from teamsData so the summary can never drift from the data again.
+  const TEAM_TOTAL = teamsData.reduce((sum, t) => sum + (Number(t.members) || 0), 0);
+  const TEAM_CATEGORIES = [
+    { id: 'all', label: 'All Teams' },
+    { id: 'product', label: 'Product' },
+    { id: 'development', label: 'Development' },
+    { id: 'design', label: 'Design' },
+    { id: 'marketing', label: 'Marketing' },
+    { id: 'operations', label: 'Operations' },
+    { id: 'hr', label: 'HR' },
+  ].map((c) => {
+    const count =
+      c.id === 'all'
+        ? TEAM_TOTAL
+        : teamsData
+            .filter((t) => t.category === c.id)
+            .reduce((sum, t) => sum + (Number(t.members) || 0), 0);
+    return { ...c, label: `${c.label} (${count})` };
+  });
+
   return (
     <div className="hr-master-layout">
       {/* 1. BREADCRUMBS & TOP HEADER */}
@@ -351,7 +391,7 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
               <div className="stat-content-box">
                 <span className="stat-meta-label">Total Employees</span>
                 <div className="stat-big-val">
-                  248 <span className="stat-delta-green">↑ 12%</span>
+                  {TEAM_TOTAL} <span className="stat-delta-green">↑ 12%</span>
                 </div>
                 <span className="stat-sub-caption">vs last month</span>
               </div>
@@ -484,7 +524,7 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
             <Card className="hr-tri-card">
               <div className="card-top-header">
                 <h3 className="card-main-title">Team Participation</h3>
-                <span className="header-view-link" onClick={() => setTab('teams')}>View All →</span>
+                <button type="button" className="header-view-link" onClick={() => setTab('teams')}>View All →</button>
               </div>
               <p className="card-sub-description" style={{ marginBottom: '12px' }}>Active members by cohort</p>
 
@@ -513,7 +553,7 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
             <Card className="hr-tri-card">
               <div className="card-top-header">
                 <h3 className="card-main-title">Key Insights</h3>
-                <span className="header-view-link" onClick={() => setTab('impact')} style={{ cursor: 'pointer' }}>View Report →</span>
+                <button type="button" className="header-view-link" onClick={() => setTab('impact')}>View Report →</button>
               </div>
 
               <div className="key-insights-stack">
@@ -633,7 +673,7 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
             <Card className="hr-activity-feed-card">
               <div className="card-top-header">
                 <h3 className="card-main-title">Recent Activity</h3>
-                <span className="header-view-link" onClick={() => setTab('teams')} style={{ cursor: 'pointer' }}>View All →</span>
+                <button type="button" className="header-view-link" onClick={() => setTab('teams')}>View All →</button>
               </div>
               <div className="hr-feed-items">
                 <div className="hr-feed-row">
@@ -681,15 +721,7 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
         <div className="hr-tab-container">
           <div className="teams-directory-top-controls">
             <div className="teams-category-pills">
-              {[
-                { id: 'all', label: 'All Teams (248)' },
-                { id: 'product', label: 'Product (25)' },
-                { id: 'development', label: 'Development (32)' },
-                { id: 'design', label: 'Design (22)' },
-                { id: 'marketing', label: 'Marketing (20)' },
-                { id: 'operations', label: 'Operations (26)' },
-                { id: 'hr', label: 'HR (18)' },
-              ].map((c) => (
+              {TEAM_CATEGORIES.map((c) => (
                 <button
                   key={c.id}
                   type="button"
@@ -857,7 +889,7 @@ export function HR({ defaultTab = 'overview', onNavigate }) {
                     <span>ENTERPRISE PILOT VALIDATION REPORT</span>
                   </div>
                   <h2 style={{ fontSize: '23px', fontWeight: 800, color: '#0F172A', lineHeight: 1.25, margin: '0 0 10px 0' }}>
-                    Measurable Well-Being Impact Across 248 Knowledge Workers
+                    Measurable Well-Being Impact Across {TEAM_TOTAL} Knowledge Workers
                   </h2>
                   <p style={{ fontSize: '13.5px', color: '#64748B', lineHeight: 1.55, margin: 0 }}>
                     Comprehensive before-and-after assessment across 7 engineering and product cohorts. Verifying physical movement, sustained afternoon alertness, and collective resilience with zero privacy compromise.
