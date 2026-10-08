@@ -41,6 +41,18 @@ export function MetricAnalyticsModal({
 
   if (!isOpen) return null;
 
+  // Derived values so the alert copy and "Remaining" row always match the
+  // live numbers instead of contradicting them (e.g. goal already exceeded).
+  const stepsVal = data.steps || 7240;
+  const stepsGoal = data.stepGoal || 8000;
+  const stepsRemaining = Math.max(0, stepsGoal - stepsVal);
+  const activeVal = data.activeMinutes || 18;
+  const activeGoal = data.activeMinGoal || 30;
+  const activeRemaining = Math.max(0, activeGoal - activeVal);
+  const sleepVal = data.sleepHours || 7.8;
+  const sleepGoal = data.sleepGoal || 8;
+  const sleepRemainingMin = Math.max(0, Math.round((sleepGoal - sleepVal) * 60));
+
   // Configurations for each metric
   const configs = {
     steps: {
@@ -58,10 +70,12 @@ export function MetricAnalyticsModal({
       goal: data.stepGoal || 8000,
       formattedGoal: (data.stepGoal || 8000).toLocaleString() + ' steps',
       pct: Math.min(100, Math.round(((data.steps || 7240) / (data.stepGoal || 8000)) * 100)),
-      remaining: Math.max(0, (data.stepGoal || 8000) - (data.steps || 7240)).toLocaleString() + ' steps',
+      remaining: stepsRemaining === 0 ? 'Goal met' : stepsRemaining.toLocaleString() + ' steps',
       alertIcon: Trophy,
-      alertTitle: 'Great progress!',
-      alertDesc: "You're just 760 steps away from your daily goal. Keep going!",
+      alertTitle: stepsRemaining === 0 ? 'Goal smashed!' : 'Great progress!',
+      alertDesc: stepsRemaining === 0
+        ? "You've hit your daily step goal. Keep the momentum going!"
+        : `You're just ${stepsRemaining.toLocaleString()} steps away from your daily goal. Keep going!`,
       trendTitle: 'Step Trend (Last 7 Days)',
       trendData: [
         { day: 'Mon', val: '6.2k', height: 42 },
@@ -92,10 +106,12 @@ export function MetricAnalyticsModal({
       goal: data.activeMinGoal || 30,
       formattedGoal: `${data.activeMinGoal || 30} minutes`,
       pct: Math.min(100, Math.round(((data.activeMinutes || 18) / (data.activeMinGoal || 30)) * 100)),
-      remaining: `${Math.max(0, (data.activeMinGoal || 30) - (data.activeMinutes || 18))} minutes`,
+      remaining: activeRemaining === 0 ? 'Goal met' : `${activeRemaining} minutes`,
       alertIcon: Zap,
-      alertTitle: 'Nice effort!',
-      alertDesc: "You're 12 minutes away from your daily goal. A short walk can help.",
+      alertTitle: activeRemaining === 0 ? 'Goal hit!' : 'Nice effort!',
+      alertDesc: activeRemaining === 0
+        ? 'You hit your active minutes goal. A short walk keeps the streak alive.'
+        : `You're ${activeRemaining} minutes away from your daily goal. A short walk can help.`,
       trendTitle: 'Active Minutes Trend (Last 7 Days)',
       trendData: [
         { day: 'Mon', val: '12', height: 26 },
@@ -128,10 +144,12 @@ export function MetricAnalyticsModal({
       goal: data.sleepGoal || 8,
       formattedGoal: `${data.sleepGoal || 8} hours`,
       pct: Math.min(100, Math.round(((data.sleepHours || 7.8) / (data.sleepGoal || 8)) * 100)),
-      remaining: '12 min',
+      remaining: sleepRemainingMin === 0 ? 'Goal met' : `${sleepRemainingMin} min`,
       alertIcon: Bed,
       alertTitle: 'Great sleep!',
-      alertDesc: 'You’re very close to your goal. A consistent sleep routine helps recovery.',
+      alertDesc: sleepRemainingMin === 0
+        ? 'You hit your sleep goal. A consistent sleep routine helps recovery.'
+        : `You're ${sleepRemainingMin} min away from your goal. A consistent sleep routine helps recovery.`,
       trendTitle: 'Sleep Trend (Last 7 Nights)',
       trendData: [
         { day: 'Mon', val: '6.5', height: 44 },

@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { CheckInModal } from '../components/domain/CheckInModal';
-import { MetricAnalyticsModal } from '../components/domain/MetricAnalyticsModal';
-import { HabitRescueModal } from '../components/domain/HabitRescueModal';
-import { WearableSyncModal } from '../components/domain/WearableSyncModal';
+const MetricAnalyticsModal = lazy(() => import('../components/domain/MetricAnalyticsModal').then(m => ({ default: m.MetricAnalyticsModal })));
+const HabitRescueModal = lazy(() => import('../components/domain/HabitRescueModal').then(m => ({ default: m.HabitRescueModal })));
+const WearableSyncModal = lazy(() => import('../components/domain/WearableSyncModal').then(m => ({ default: m.WearableSyncModal })));
+
+function Fallback({ children }) {
+  return <div style={{ padding: '22px', color: '#64748B', fontSize: '13px', textAlign: 'center' }}>{children}</div>;
+}
+
 import {
   Footprints,
   Flame,
@@ -122,7 +127,7 @@ export function Home({ data, onRefresh, onNavigate }) {
       <section className="home-master-hero">
         <div className="hero-landscape-bg">
           <img
-            src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1600&q=80"
+            src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=720&q=78"
             alt="Sunny morning wellness runner"
             className="hero-landscape-img"
           />
@@ -705,8 +710,8 @@ export function Home({ data, onRefresh, onNavigate }) {
                 <div className="rec-footer">
                   <div className="rec-social-avatars">
                     <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=60&q=80" alt="user" />
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=60&q=80" alt="user" />
-                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=60&q=80" alt="user" />
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=60&q=82" alt="user" />
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=60&q=82" alt="user" />
                     <span>1.2K joined</span>
                   </div>
                   <div className="rec-action-arrow" aria-hidden="true">→</div>
@@ -826,36 +831,42 @@ export function Home({ data, onRefresh, onNavigate }) {
         onSaved={onRefresh}
       />
 
-      <MetricAnalyticsModal
-        isOpen={!!activeMetricModal}
-        onClose={() => setActiveMetricModal(null)}
-        metricType={activeMetricModal || 'steps'}
-        data={{
-          steps: currentSteps,
-          stepGoal,
-          activeMinutes: activeMinActual,
-          activeMinGoal,
-          sleepHours: sleepActual,
-          sleepGoal,
-        }}
-      />
+      <Suspense fallback={<Fallback>Loading metric view…</Fallback>}>
+        <MetricAnalyticsModal
+          isOpen={!!activeMetricModal}
+          onClose={() => setActiveMetricModal(null)}
+          metricType={activeMetricModal || 'steps'}
+          data={{
+            steps: currentSteps,
+            stepGoal,
+            activeMinutes: activeMinActual,
+            activeMinGoal,
+            sleepHours: sleepActual,
+            sleepGoal,
+          }}
+        />
+      </Suspense>
 
-      <HabitRescueModal
-        isOpen={isRescueOpen}
-        onClose={() => setIsRescueOpen(false)}
-        rescueData={{
-          originalGoal: stepGoal,
-          reducedGoal: 2000,
-          id: data.rescue?.id || 'rescue-1'
-        }}
-        onGoalAccepted={onRefresh}
-      />
+      <Suspense fallback={<Fallback>Loading Habit Rescue…</Fallback>}>
+        <HabitRescueModal
+          isOpen={isRescueOpen}
+          onClose={() => setIsRescueOpen(false)}
+          rescueData={{
+            originalGoal: stepGoal,
+            reducedGoal: 2000,
+            id: data.rescue?.id || 'rescue-1'
+          }}
+          onGoalAccepted={onRefresh}
+        />
+      </Suspense>
 
-      <WearableSyncModal
-        isOpen={isWatchSyncOpen}
-        onClose={() => setIsWatchSyncOpen(false)}
-        onSyncComplete={onRefresh}
-      />
+      <Suspense fallback={<Fallback>Loading smartwatch sync…</Fallback>}>
+        <WearableSyncModal
+          isOpen={isWatchSyncOpen}
+          onClose={() => setIsWatchSyncOpen(false)}
+          onSyncComplete={onRefresh}
+        />
+      </Suspense>
     </div>
   );
 }

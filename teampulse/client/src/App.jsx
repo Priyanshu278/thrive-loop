@@ -6,9 +6,7 @@ import { Home } from './pages/Home';
 import { Challenge } from './pages/Challenge';
 import { Rescue } from './pages/Rescue';
 import { Team } from './pages/Team';
-import { Privacy } from './pages/Privacy';
 import { Profile } from './pages/Profile';
-import { HR } from './pages/HR';
 import { ThriveLoopLogo } from './components/ui/ThriveLoopLogo';
 import { getMemberAvatar, handleAvatarError } from './utils/avatars';
 import {
@@ -27,9 +25,33 @@ import {
   ArrowRight,
   Sparkles,
   Sprout,
+  BookOpen,
   X,
   LogOut
 } from 'lucide-react';
+import { lazy, Suspense } from 'react';
+
+const HelpModal = lazy(() => import('./components/domain/HelpModal').then(m => ({ default: m.HelpModal })));
+const HR = lazy(() => import('./pages/HR').then(m => ({ default: m.HR })));
+const Privacy = lazy(() => import('./pages/Privacy').then(m => ({ default: m.Privacy })));
+
+function HelpFallback() {
+  return (
+    <div style={{ padding: '22px', color: '#64748B', fontSize: '13px', textAlign: 'center' }}>Loading help guide…</div>
+  );
+}
+
+function HRFallback() {
+  return (
+    <div style={{ padding: '22px', color: '#64748B', fontSize: '13px', textAlign: 'center' }}>Loading HR workspace…</div>
+  );
+}
+
+function PrivacyFallback() {
+  return (
+    <div style={{ padding: '22px', color: '#64748B', fontSize: '13px', textAlign: 'center' }}>Loading privacy details…</div>
+  );
+}
 import './styles.css';
 
 export default function App() {
@@ -45,6 +67,8 @@ export default function App() {
   const [showNotif, setShowNotif] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [hash, setHash] = useState(window.location.hash);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [helpView, setHelpView] = useState('intro');
 
   function handleSearchKeyDown(e) {
     if (e.key === 'Enter') {
@@ -234,6 +258,21 @@ export default function App() {
           <ThriveLoopLogo size={28} showText={true} />
         </div>
 
+        {/* Help / first-time user guide launcher */}
+        <div className="tl-nav-section" style={{ marginTop: '6px' }}>
+          <button
+            type="button"
+            className="tl-nav-link"
+            onClick={() => {                setHelpOpen(true);
+              setHelpView(role === 'hr' ? 'hr' : 'employee');
+            }}
+            title="How to use ThriveLoop"
+          >
+            <BookOpen size={18} className="tl-nav-icon" />
+            <span>Help / Guide</span>
+          </button>
+        </div>
+
         {/* Role-based navigation */}
         {role === 'hr' ? (
           <div className="tl-nav-section">
@@ -278,6 +317,8 @@ export default function App() {
             </div>
           </div>
         )}
+
+        {/* Help / first-time user guide launcher (already rendered above as its own section) */}
 
         {/* Bottom Sidebar Tile: Botanical Card */}
         <div className="tl-sidebar-card">
@@ -566,6 +607,34 @@ export default function App() {
                     className="tl-menu-action-btn"
                     onClick={() => {
                       setShowProfileMenu(false);
+                      setHelpOpen(true);
+                      setHelpView(role === 'hr' ? 'hr' : 'employee');
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '9px 12px',
+                      background: 'none',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      color: '#1E293B',
+                      textAlign: 'left',
+                      width: '100%'
+                    }}
+                  >
+                    <BookOpen size={16} style={{ color: '#059669' }} />
+                    <span>Help / Guide</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="tl-menu-action-btn"
+                    onClick={() => {
+                      setShowProfileMenu(false);
                       handleLogout();
                     }}
                     style={{
@@ -621,18 +690,22 @@ export default function App() {
             <Profile me={data.me} onLogout={handleLogout} />
           )}
           {page === 'privacy' && role !== 'hr' && (
-            <Privacy onBack={() => setPage('home')} />
+            <Suspense fallback={<PrivacyFallback />}>
+              <Privacy onBack={() => setPage('home')} />
+            </Suspense>
           )}
           {['overview', 'teams', 'impact', 'privacy', 'roi'].includes(page) && role === 'hr' && (
-            <HR defaultTab={page} onNavigate={setPage} />
+            <Suspense fallback={<HRFallback />}>
+              <HR defaultTab={page} onNavigate={setPage} />
+            </Suspense>
           )}
           {['overview', 'teams', 'impact', 'roi'].includes(page) && role !== 'hr' && (
-            <HR defaultTab={page} onNavigate={setPage} />
+            <Suspense fallback={<HRFallback />}>
+              <HR defaultTab={page} onNavigate={setPage} />
+            </Suspense>
           )}
         </div>
-      </main>
-
-      {/* MOBILE BOTTOM NAVIGATION BAR */}
+      </main>        {/* MOBILE BOTTOM NAVIGATION BAR */}
       <nav className="tl-mobile-bottom-nav" aria-label="Mobile Navigation">
         {(role === 'hr' ? hrNav : employeeNav).map((item) => {
           const Icon = item.icon;
@@ -653,6 +726,17 @@ export default function App() {
           );
         })}
       </nav>
+
+      {helpOpen && (
+        <Suspense fallback={<HelpFallback />}>
+          <HelpModal
+            isOpen={helpOpen}
+            onClose={() => setHelpOpen(false)}
+            currentRole={role}
+            initialView={helpView}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
